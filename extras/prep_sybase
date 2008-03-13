@@ -1,0 +1,69 @@
+#!/bin/sh
+# $Id: prep_sybase,v 1.7 2004/09/29 04:02:41 wwg Exp $
+# Warren W. Gay VE3WWG
+
+set -eu
+
+LINKER_ARGS="$1"			# Grab the linker arguments from make
+
+TEMP="${TEMP:-/tmp}"
+TMPDIR="${TMPDIR:-$TEMP}"
+
+TMP1="$TMPDIR/$$-1.tmp"
+TMP2="$TMPDIR/$$-2.tmp"
+TMP3="$TMPDIR/$$-3.tmp"
+
+trap "rm -f '$TMP1' '$TMP2' '$TMP3'" 0
+
+# 
+# Process Sybase Constants :
+# 
+
+sort -k1n,1 >"$TMP1"			# These must be sorted by value for GNAT
+
+
+while read value type ; do
+	echo "      $type,"
+done <"$TMP1" | sed '$s|,||' >"$TMP2"	# These are the enumerated types
+
+
+while read value type ; do
+	echo "      $type => $value,"
+done <"$TMP1" | sed '$s|,||' >"$TMP3"	# These are the enumerated types in the for clause
+
+
+#
+# Put the pragma Linker_Options into the spec :
+#
+sed -n '1,/-- Sybase Linker Options/p' <apq-sybase.ads-in
+
+if [ "$LINKER_ARGS" != "win32" ] ; then	# Win32 links are satisfied by our syadapter.dll
+	set -- $LINKER_ARGS
+
+	while [ $# -gt 0 ] ; do
+		echo "   pragma Linker_Options(\"$1\");"
+		shift
+	done
+else
+	echo "   -- None for win32"
+fi
+
+#
+# Put the Data_Format_Type and for clause into the spec
+#
+sed '1,/-- Sybase Linker Options/d;/%type:Field_Type%/,$d' <apq-sybase.ads-in
+
+cat <"$TMP2"
+
+sed '1,/%type:Field_Type%/d;/%for:Field_Type%/,$d' <apq-sybase.ads-in
+
+cat <"$TMP3"
+
+
+sed '1,/%for:Field_Type%/d' <apq-sybase.ads-in | sed '/%SYBASE_OPTIONS%/,$d'
+
+cat work/sybopts.tmp
+
+sed '1,/%SYBASE_OPTIONS%/d' <apq-sybase.ads-in
+
+# End $Source: /cvsroot/apq/apq/prep_sybase,v $
