@@ -29,7 +29,7 @@ apq-sybase.ads-clean:
 
 
 c_libs: apq-sybase.ads c_objs
-	cd lib && gcc -shared ../obj-c/c_sybase.o -o libapq-sybasehelp.so -lpq
+	cd lib && gcc -shared ../obj-c/c_sybase.o -o libapq-sybasehelp.so
 
 #c_objs:
 #	cd obj-c && gcc -I../src-c ../src-c/numeric.c -c -o numeric.o && gcc -I../src-c ../src-c/notices.c -c -o notices.o
