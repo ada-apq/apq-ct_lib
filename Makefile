@@ -2,13 +2,12 @@
 #
 # @author Marcelo Coraça de Freitas <marcelo.batera@gmail.com> 
 
-ADA_PROJECT_PATH=.:../awlib:../apq
 
 projectFile="apq-sybase.gpr"
 
 
 libs: c_libs
-	ADA_PROJECT_PATH=${ADA_PROJECT_PATH} gnatmake -P ${projectFile}
+	gnatmake -P ${projectFile}
 
 
 
@@ -39,7 +38,7 @@ all: libs
 
 clean: apq-sybase.ads-clean c_objs-clean
 	@rm -f obj-c/* lib/*
-	@ADA_PROJECT_PATH=${ADA_PROJECT_PATH} gnatclean -P ${projectFile}
+	gnatclean -P ${projectFile}
 	@echo "All clean"
 
 docs:
