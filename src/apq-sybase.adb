@@ -287,6 +287,17 @@ package body APQ.Sybase is
 
 
 	--
+	-- Print a debug trace of Sybase results to stderr
+	--
+	procedure Sy_Debug_Results(Cmd : Sy_Cmd_Type) is
+		procedure c_sy_dbg_results(Cmd : Sy_Cmd_Type);
+		pragma import(C,c_sy_dbg_results,"c_sy_dbg_results");
+	begin
+		c_sy_dbg_results(Cmd);
+	end Sy_Debug_Results;
+
+
+	--
 	-- Cancel pending results
 	--
 	function Sy_Cancel(Cmd : Sy_Cmd_Type) return Sy_Cancel_Type is
@@ -308,16 +319,6 @@ package body APQ.Sybase is
 		end case;
 	end Sy_Cancel;
 
-
-	--
-	-- Print a debug trace of Sybase results to stderr
-	--
-	procedure Sy_Debug_Results(Cmd : Sy_Cmd_Type) is
-		procedure c_sy_dbg_results(Cmd : Sy_Cmd_Type);
-		pragma import(C,c_sy_dbg_results,"c_sy_dbg_results");
-	begin
-		c_sy_dbg_results(Cmd);
-	end Sy_Debug_Results;
 
 
 	--
@@ -792,25 +793,6 @@ package body APQ.Sybase is
 	end Sy_Get_Data;
 
 
-	--
-	-- FREE COLUMN DATA
-	--
-	procedure Free(Values : in out Sy_Columns_Ptr; Release_Array : Boolean := True) is
-		procedure Free_Array is new Ada.Unchecked_Deallocation(Sy_Columns_Array,Sy_Columns_Ptr);
-	begin
-
-		for X in Values.all'Range loop
-			if Values.all(X).Str_Value /= null then
-				Free(Values.all(X).Str_Value);
-			end if;
-		end loop;
-		if Release_Array then
-			Free_Array(Values);
-		end if;
-
-	end Free;
-
-
 
 	procedure Sy_Bool_Option(Conn : Sy_Conn_Type; E : Sybase_Enum_Option; Arg : Interfaces.C.int) is
 		use Interfaces.C;
@@ -879,5 +861,24 @@ package body APQ.Sybase is
 				"SY70: Failed to set a Sybase string option (Sy_String_Option).");
 		end if;
 	end Sy_String_Option;
+
+	--
+	-- FREE COLUMN DATA
+	--
+	procedure Free(Values : in out Sy_Columns_Ptr; Release_Array : Boolean := True) is
+		procedure Free_Array is new Ada.Unchecked_Deallocation(Sy_Columns_Array,Sy_Columns_Ptr);
+	begin
+
+		for X in Values.all'Range loop
+			if Values.all(X).Str_Value /= null then
+				Free(Values.all(X).Str_Value);
+			end if;
+		end loop;
+		if Release_Array then
+			Free_Array(Values);
+		end if;
+
+	end Free;
+
 
 end APQ.Sybase;
