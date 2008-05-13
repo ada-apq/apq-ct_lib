@@ -1,4 +1,4 @@
--- Build file for APQ.Sybase.
+-- Build file for APQ.ct_lib.
 --
 -- author Marcelo Coraça de Freitas <marcelo.batera@gmail.com> 
 --
@@ -10,7 +10,7 @@
 
 with "apq.gpr";
 
-project APQ.Sybase is
+project APQ.ct_lib is
 
 	version := "2.3.0";
 	
@@ -28,9 +28,9 @@ project APQ.Sybase is
 	
 	-- LIBRARY
 	for Library_Dir use "lib";
-	for Library_Name use "apq-sybase";
+	for Library_Name use "apq-ct_lib";
 	for Library_Kind use "dynamic";
-	for Library_Version use "libapq-sybase.so." & Version;
+	for Library_Version use "libapq-ct_lib.so." & Version;
 	
 	
 	package Compiler is
@@ -42,15 +42,15 @@ project APQ.Sybase is
 	package Linker is
 		for Default_Switches ("Ada") use
 			APQ.Linker'Default_Switches("Ada") &
-			"-lapq-sybasehelp" &
+			"-lapq-ct_libhelp" &
 			"-lct";
 --			"-lpq" &
 --			"-lsybdb" & 
 --			"-ltds" & 
 --			"-ltdsodbc" &
 --			"-ltdssrv";
---			"-lapq-sybasehelp";
+--			"-lapq-ct_libhelp";
 	end Linker;
 
-end APQ.Sybase;
+end APQ.ct_lib;
 

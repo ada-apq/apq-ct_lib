@@ -3,7 +3,7 @@
 # @author Marcelo Coraça de Freitas <marcelo.batera@gmail.com> 
 
 
-projectFile="apq-sybase.gpr"
+projectFile="apq-ct_lib.gpr"
 
 
 libs: c_libs
@@ -19,16 +19,16 @@ c_objs-clean:
 
 
 
-apq-sybase.ads:
+apq-ct_lib.ads:
 	make -C extras
 
-apq-sybase.ads-clean:
+apq-ct_lib.ads-clean:
 	make -C extras clean
-	rm -f src/apq-sybase.ads
+	rm -f src/apq-ct_lib.ads
 
 
-c_libs: apq-sybase.ads c_objs
-	cd lib && gcc -shared ../obj-c/c_sybase.o -o libapq-sybasehelp.so
+c_libs: apq-ct_lib.ads c_objs
+	cd lib && gcc -shared ../obj-c/c_ct_lib.o -o libapq-ct_libhelp.so
 
 #c_objs:
 #	cd obj-c && gcc -I../src-c ../src-c/numeric.c -c -o numeric.o && gcc -I../src-c ../src-c/notices.c -c -o notices.o
@@ -36,7 +36,7 @@ c_libs: apq-sybase.ads c_objs
 all: libs
 
 
-clean: apq-sybase.ads-clean c_objs-clean
+clean: apq-ct_lib.ads-clean c_objs-clean
 	@rm -f obj-c/* lib/*
 	gnatclean -P ${projectFile}
 	@echo "All clean"

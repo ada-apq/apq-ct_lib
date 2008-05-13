@@ -1,6 +1,6 @@
 
 
-all: c_sybase.o
+all: c_ct_lib.o
 
 
 clean:
