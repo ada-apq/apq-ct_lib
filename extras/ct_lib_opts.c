@@ -1,7 +1,7 @@
 /****************************************************************************/
 /*                          APQ DATABASE BINDINGS                           */
 /*                                                                          */
-/*                              A P Q - SYBASE 				    */
+/*                              A P Q - CT_LIB 				    */
 /*                                                                          */
 /*                                                                          */
 /*         Copyright (C) 2002-2007, Warren W. Gay VE3WWG                    */
@@ -79,7 +79,7 @@ main(int argc,char **argv) {
 		printf("      (\n");
 		printf("        Name        => \"%-18.18s\",\n",options[x].name);
 		printf("        Length      => %d,\n",strlen(options[x].name));
-		printf("        Sybase_Enum => %u,\n",options[x].value);
+		printf("        CT_LIB_Enum => %u,\n",options[x].value);
 		printf("        Argument    => %s\n",options[x].atype);
 		printf("      )%s\n",x+1==(sizeof options/sizeof options[0])?"":",");
 	}

@@ -2,7 +2,7 @@
 --                                                                          --
 --                          APQ DATABASE BINDINGS                           --
 --                                                                          --
---                              A P Q - SYBASE 				    --
+--                              A P Q - CT_Lib 				    --
 --									    --
 --                                 S p e c                                  --
 --                                                                          --
@@ -40,7 +40,7 @@ with Ada.Strings.Unbounded;
 with Interfaces.C_Streams;
 
 
-package APQ.Sybase.Client is
+package APQ.CT_Lib.Client is
 
 	package Str renames Ada.Streams;
 	package CStr renames Interfaces.C_Streams;
@@ -132,12 +132,12 @@ private
 
 	type Connection_Type is new APQ.Root_Connection_Type with
 		record
-			Options :	String_Ptr;				-- Sybase database engine options
-			Context :	Sy_Context_Type := Null_Context;	-- Sybase context
-			Connection :	Sy_Conn_Type := Null_Connection;	-- Sybase connection object
+			Options :	String_Ptr;				-- CT_Lib database engine options
+			Context :	CT_Lib_Context_Type := Null_Context;	-- CT_Lib context
+			Connection :	CT_Lib_Conn_Type := Null_Connection;	-- CT_Lib connection object
 			Connected :	Boolean := False;			-- True when connected
 			SQLCA :		SQLCA_Ptr;				-- SQL Communications Area
-			Sy_Database :	String_Ptr;				-- Deferred database change
+			CT_Lib_Database :	String_Ptr;				-- Deferred database change
 		end record;
 
 	procedure Finalize(C : in out Connection_Type);
@@ -145,16 +145,16 @@ private
 
 	function query_factory(C: in Connection_Type) return Root_Query_Type'Class;
 
-	type Cursor_Name_Type is new String(1..10);			-- Sybase cursor name
+	type Cursor_Name_Type is new String(1..10);			-- CT_Lib cursor name
 
 	type Query_Type is new APQ.Root_Query_Type with
 		record
 			Cursor_Name :	Cursor_Name_Type;		-- Generated cursor name
 			SQLCA :		SQLCA_Ptr;			-- As last used by Connection_Type (cheat)
-			Cmd :		Sy_Cmd_Type := Null_Command;	-- Sybase command that was executed
+			Cmd :		CT_Lib_Cmd_Type := Null_Command;	-- CT_Lib command that was executed
 			Results :	Result_Type := No_Results;	-- Query execution results
 			Columns :	Natural := 0;			-- # of columns in row data
-			Values :	Sy_Columns_Ptr;			-- Described columns and their values
+			Values :	CT_Lib_Columns_Ptr;			-- Described columns and their values
 			Row_ID :	Row_ID_Type;			-- Extracted from @@identity
 		end record;
 
@@ -167,63 +167,63 @@ private
 	type Client_Msg_CB is access
 		procedure(
 			Connection :		System.Address;
-			Message_Layer :		APQ.Sybase.Layer_Type;
-			Message_Origin :	APQ.Sybase.Origin_Type;
-			Message_Severity :	APQ.Sybase.Severity_Type;
-			Message_Number :	APQ.Sybase.Message_Number_Type;
+			Message_Layer :		APQ.CT_Lib.Layer_Type;
+			Message_Origin :	APQ.CT_Lib.Origin_Type;
+			Message_Severity :	APQ.CT_Lib.Severity_Type;
+			Message_Number :	APQ.CT_Lib.Message_Number_Type;
 			Message :		Interfaces.C.strings.chars_ptr;
-			Message_Length :	APQ.Sybase.Int_Type;
+			Message_Length :	APQ.CT_Lib.Int_Type;
 			OS_Message :		Interfaces.C.strings.chars_ptr;
-			OS_Message_Length :	APQ.Sybase.Int_Type
+			OS_Message_Length :	APQ.CT_Lib.Int_Type
 	  );
-	pragma Export(C,Client_Msg_CB,"client_msg_cb");
+	pragma Export(C, Client_Msg_CB, "client_msg_cb");
 
 	type Server_Msg_CB is access
 		procedure(
 			Connection :		System.Address;
-			Message_Severity :	APQ.Sybase.Severity_Type;
-			Message_Number :	APQ.Sybase.Message_Number_Type;
-			State :			APQ.Sybase.State_Type;
-			Line :			APQ.Sybase.Line_Type;
+			Message_Severity :	APQ.CT_Lib.Severity_Type;
+			Message_Number :	APQ.CT_Lib.Message_Number_Type;
+			State :			APQ.CT_Lib.State_Type;
+			Line :			APQ.CT_Lib.Line_Type;
 			Server_Name :		Interfaces.C.Strings.chars_ptr;
-			Server_Name_Length :	APQ.Sybase.Int_Type;
+			Server_Name_Length :	APQ.CT_Lib.Int_Type;
 			Proc_Name :		Interfaces.C.Strings.chars_ptr;
-			Proc_Name_Length :	APQ.Sybase.Int_Type;
+			Proc_Name_Length :	APQ.CT_Lib.Int_Type;
 			Message :		Interfaces.C.Strings.chars_ptr
 		);
-	pragma Export(C,Server_Msg_CB,"server_msg_cb");
+	pragma Export(C, Server_Msg_CB, "server_msg_cb");
 
 	procedure Set_Client_CB(Proc : Client_Msg_CB);
 	procedure Set_Server_CB(Proc : Server_Msg_CB);
 
-	procedure Sy_Client_CB(
+	procedure CT_Lib_Client_CB(
 		Connection :		System.Address;
-		Message_Layer :		APQ.Sybase.Layer_Type;
-		Message_Origin :	APQ.Sybase.Origin_Type;
-		Message_Severity :	APQ.Sybase.Severity_Type;
-		Message_Number :	APQ.Sybase.Message_Number_Type;
+		Message_Layer :		APQ.CT_Lib.Layer_Type;
+		Message_Origin :	APQ.CT_Lib.Origin_Type;
+		Message_Severity :	APQ.CT_Lib.Severity_Type;
+		Message_Number :	APQ.CT_Lib.Message_Number_Type;
 		Message :		Interfaces.C.Strings.chars_ptr;
-		Message_Length :	APQ.Sybase.Int_Type;
+		Message_Length :	APQ.CT_Lib.Int_Type;
 		OS_Message :		Interfaces.C.Strings.chars_ptr;
-		OS_Message_Length :	APQ.Sybase.Int_Type
+		OS_Message_Length :	APQ.CT_Lib.Int_Type
 	);
-	pragma Export(C,Sy_Client_CB,"sy_client_cb");
+	pragma Export(C,CT_Lib_Client_CB,"CT_Lib_client_cb");
 
-	procedure Sy_Server_CB(
+	procedure CT_Lib_Server_CB(
 		Connection :		System.Address;
-		Message_Severity :	APQ.Sybase.Severity_Type;
-		Message_Number :	APQ.Sybase.Message_Number_Type;
-		State :			APQ.Sybase.State_Type;
-		Line :			APQ.Sybase.Line_Type;
+		Message_Severity :	APQ.CT_Lib.Severity_Type;
+		Message_Number :	APQ.CT_Lib.Message_Number_Type;
+		State :			APQ.CT_Lib.State_Type;
+		Line :			APQ.CT_Lib.Line_Type;
 		Server_Name :		Interfaces.C.Strings.chars_ptr;
-		Server_Name_Length :	APQ.Sybase.Int_Type;
+		Server_Name_Length :	APQ.CT_Lib.Int_Type;
 		Proc_Name :		Interfaces.C.Strings.chars_ptr;
-		Proc_Name_Length :	APQ.Sybase.Int_Type;
+		Proc_Name_Length :	APQ.CT_Lib.Int_Type;
 		Message :		Interfaces.C.Strings.chars_ptr
 	);
-	pragma Export(C,Sy_Server_CB,"sy_server_cb");
+	pragma Export(C,CT_Lib_Server_CB,"CT_Lib_server_cb");
 
 
-end APQ.Sybase.Client;
+end APQ.CT_Lib.Client;
 
--- End $Source: /cvsroot/apq/apq/apq-sybase-client.ads,v $
+-- End $Source: /cvsroot/apq/apq/apq-CT_Lib-client.ads,v $

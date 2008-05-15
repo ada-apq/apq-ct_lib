@@ -2,7 +2,7 @@
 --                                                                          --
 --                          APQ DATABASE BINDINGS                           --
 --                                                                          --
---                              A P Q - SYBASE				    --
+--                              A P Q - CT_LIB				    --
 --                                                                          --
 --                                 S p e c                                  --
 --                                                                          --
@@ -30,15 +30,15 @@
 ------------------------------------------------------------------------------
 
 -- ***********************************************************
--- WARNING: The APQ.Sybase package is generated. Apply changes
---          to input file apq-sybase.ads-in instead!!!!!!!!!!!
+-- WARNING: The APQ.CT_Lib package is generated. Apply changes
+--          to input file apq-ct_lib.ads-in instead!!!!!!!!!!!
 -- ***********************************************************
 
 with Interfaces.C;
 
-package APQ.Sybase is
+package APQ.CT_Lib is
 
-	-- Sybase Linker Options
+	-- CT_LIB Linker Options
 
 	--
 	-- Results from a query execution :
@@ -63,7 +63,7 @@ package APQ.Sybase is
 		Param_Results           => 6,
 		Status_Results          => 7
 	);
-	for Result_Type'Size use 32;           -- Must be integer sized (see c_sybase.c)
+	for Result_Type'Size use 32;           -- Must be integer sized (see c_ct_lib.c)
 
 	type Field_Type is (
  		%type:Field_Type%
@@ -97,7 +97,7 @@ private
 	type State_Type is new Long_Type;
 	type Line_Type is new Long_Type;
 
-	type Sy_Cancel_Type is (
+	type CT_Lib_Cancel_Type is (
  	Cancel_Failed,
  	Cancel_Succeeded,
  	Cancel_With_Open_Cursor
@@ -117,9 +117,9 @@ private
 
 	CS_MAX_NAME :        constant Positive := 128 + 4;
 
-	Sy_Change_Database_Context : constant Message_Number_Type := 5701;      -- Database name message
+	CT_Lib_Change_Database_Context : constant Message_Number_Type := 5701;      -- Database name message
 
-	type Sy_Column_Type is
+	type CT_Lib_Column_Type is
  	record
 		Name :         String(1..CS_MAX_NAME);    -- Column name, if any
 		Name_Length :  Natural;                   -- 0 if there is no column name
@@ -131,8 +131,8 @@ private
 		Str_Value :    String_Ptr;                -- String value of this column
  	end record;
 
-	type Sy_Columns_Array is array(Column_Index_Type range <>) of Sy_Column_Type;
-	type Sy_Columns_Ptr is access all Sy_Columns_Array;
+	type CT_Lib_Columns_Array is array(Column_Index_Type range <>) of CT_Lib_Column_Type;
+	type CT_Lib_Columns_Ptr is access all CT_Lib_Columns_Array;
 
 	type Get_Data_Type is (
 		Get_Data_Failed,                 -- Call failed
@@ -184,17 +184,17 @@ private
 	type Return_Status is range -2 ** 31 .. 2 ** 31 - 1;
 	for Return_Status'Size use 32;
 
-	type Sy_Error_Type is range -2 ** 31 .. 2 ** 31 - 1;
+	type CT_Lib_Error_Type is range -2 ** 31 .. 2 ** 31 - 1;
 
-	type Sy_Context_Type is new System.Address;     -- SYBASE Context (CS_CONTEXT)
-	type Sy_Conn_Type is new System.Address;        -- SYBASE Connection (CS_CONNECTION)
-	type Sy_Cmd_Type is new System.Address;         -- SYBASE Command (CS_COMMAND)
+	type CT_Lib_Context_Type is new System.Address;     -- CT_Lib_lib Context (CS_CONTEXT)
+	type CT_Lib_Conn_Type is new System.Address;        -- CT_Lib_lib Connection (CS_CONNECTION)
+	type CT_Lib_Cmd_Type is new System.Address;         -- CT_Lib_lib Command (CS_COMMAND)
 
-	Null_Context :    constant Sy_Context_Type      := Sy_Context_Type(System.Null_Address);
-	Null_Connection : constant Sy_Conn_Type         := Sy_Conn_Type(System.Null_Address);
-	Null_Command :    constant Sy_Cmd_Type          := Sy_Cmd_Type(System.Null_Address);
+	Null_Context :    constant CT_Lib_Context_Type      := CT_Lib_Context_Type(System.Null_Address);
+	Null_Connection : constant CT_Lib_Conn_Type         := CT_Lib_Conn_Type(System.Null_Address);
+	Null_Command :    constant CT_Lib_Cmd_Type          := CT_Lib_Cmd_Type(System.Null_Address);
 
-	-- Sybase Options
+	-- CT_LIB Options
 
 	type Option_Argument_Type is (
 		ARG_BOOLEAN,         -- Boolean (T or F)
@@ -205,81 +205,81 @@ private
 		ARG_CHAR_PTR_NULL    -- Argument is char pointer but the value NULL is also permitted
 	);
 
-	type Sybase_Enum_Option is mod 2**32;
+	type CT_Lib_Enum_Option is mod 2**32;
 
-	type Sybase_Option is
+	type CT_Lib_Option is
  	record
 		Name :      String(1..18);
 		Length :    Positive;
-		Sybase_Enum: Sybase_Enum_Option;
+		CT_Lib_Enum: CT_Lib_Enum_Option;
 		Argument :  Option_Argument_Type;
  	end record;
 
-	type Sybase_Options is array(Positive range <>) of Sybase_Option;
+	type CT_Lib_Options is array(Positive range <>) of CT_Lib_Option;
 
-	Options : constant Sybase_Options := (
-		%SYBASE_OPTIONS%
+	Options : constant CT_Lib_Options := (
+		%CT_LIB_OPTIONS%
 	);
 
-	function Sy_Context_Of(Conn : Sy_Conn_Type) return Sy_Context_Type;
-	function Sy_Connection_Of(Cmd : Sy_Cmd_Type) return Sy_Conn_Type;
+	function CT_Lib_Context_Of(Conn : CT_Lib_Conn_Type) return CT_Lib_Context_Type;
+	function CT_Lib_Connection_Of(Cmd : CT_Lib_Cmd_Type) return CT_Lib_Conn_Type;
 
---   procedure Get_SQLCA(Conn : Sy_Conn_Type; SQLCA : out SQLCA_Type);
+--   procedure Get_SQLCA(Conn : CT_Lib_Conn_Type; SQLCA : out SQLCA_Type);
 	procedure Clear_SQLCA(SQLCA : in out SQLCA_Type);
 
-	function Sy_Alloc_Context return Sy_Context_Type;
-	procedure Sy_Free_Context(Ctx : in out Sy_Context_Type);
-	function Sy_Alloc_Connection(Ctx : Sy_Context_Type; Conn : System.Address) return Sy_Conn_Type;
-	procedure Sy_Free_Connection(Conn : in out Sy_Conn_type);
+	function CT_Lib_Alloc_Context return CT_Lib_Context_Type;
+	procedure CT_Lib_Free_Context(Ctx : in out CT_Lib_Context_Type);
+	function CT_Lib_Alloc_Connection(Ctx : CT_Lib_Context_Type; Conn : System.Address) return CT_Lib_Conn_Type;
+	procedure CT_Lib_Free_Connection(Conn : in out CT_Lib_Conn_type);
 
-	function Sy_Set_Hostname(Conn : Sy_Conn_Type; Host : String_Ptr) return Boolean;
-	function Sy_Set_Userid(Conn : Sy_Conn_Type; Userid : String_Ptr) return Boolean;
-	function Sy_Set_Passwd(Conn : Sy_Conn_Type; Passwd : String_Ptr) return Boolean;
-	function Sy_Set_Database(Conn : Sy_Conn_Type; Database : String_Ptr) return Boolean;
-	function Sy_Connect(Conn : Sy_Conn_Type; Instance : String) return Boolean;
-	function Sy_Disconnect(Conn : Sy_Conn_Type) return Boolean;
+	function CT_Lib_Set_Hostname(Conn : CT_Lib_Conn_Type; Host : String_Ptr) return Boolean;
+	function CT_Lib_Set_Userid(Conn : CT_Lib_Conn_Type; Userid : String_Ptr) return Boolean;
+	function CT_Lib_Set_Passwd(Conn : CT_Lib_Conn_Type; Passwd : String_Ptr) return Boolean;
+	function CT_Lib_Set_Database(Conn : CT_Lib_Conn_Type; Database : String_Ptr) return Boolean;
+	function CT_Lib_Connect(Conn : CT_Lib_Conn_Type; Instance : String) return Boolean;
+	function CT_Lib_Disconnect(Conn : CT_Lib_Conn_Type) return Boolean;
 
-	function Sy_Exec(Conn : Sy_Conn_Type; SQL : String) return Sy_Cmd_Type;
-	function Sy_Release(Cmd : Sy_Cmd_Type) return Sy_Cmd_Type;
+	function CT_Lib_Exec(Conn : CT_Lib_Conn_Type; SQL : String) return CT_Lib_Cmd_Type;
+	function CT_Lib_Release(Cmd : CT_Lib_Cmd_Type) return CT_Lib_Cmd_Type;
 
-	function Sy_Open_Cursor(
-		Conn :         Sy_Conn_Type;     -- Sybase connection
+	function CT_Lib_Open_Cursor(
+		Conn :         CT_Lib_Conn_Type;     -- ct_lib connection
 		SQL :          String;           -- SQL text
 		Cursor_Name :  System.Address;   -- Start of cursor name
 		Name_Length :  Natural;          -- Length of cursor name
 		For_Update :   Boolean           -- True if cursor is for update
-	) return Sy_Cmd_Type;
+	) return CT_Lib_Cmd_Type;
 
-	function Sy_Close_Cursor(Cmd : Sy_Cmd_Type) return Boolean;
+	function CT_Lib_Close_Cursor(Cmd : CT_Lib_Cmd_Type) return Boolean;
 
-	procedure Sy_Results(Cmd : Sy_Cmd_Type; Results : out Result_Type; Columns : out Natural);
-	function Sy_Is_Done(Cmd : Sy_Cmd_Type) return Boolean;
-	function Sy_Is_End(Cmd : Sy_Cmd_Type) return Boolean;
-	procedure Sy_Debug_Results(Cmd : Sy_Cmd_Type);
+	procedure CT_Lib_Results(Cmd : CT_Lib_Cmd_Type; Results : out Result_Type; Columns : out Natural);
+	function CT_Lib_Is_Done(Cmd : CT_Lib_Cmd_Type) return Boolean;
+	function CT_Lib_Is_End(Cmd : CT_Lib_Cmd_Type) return Boolean;
+	procedure CT_Lib_Debug_Results(Cmd : CT_Lib_Cmd_Type);
 
-	function Sy_Fetch(Cmd : Sy_Cmd_Type) return Fetch_Return_Type;
-	function Sy_Cancel(Cmd : Sy_Cmd_Type) return Sy_Cancel_Type;
+	function CT_Lib_Fetch(Cmd : CT_Lib_Cmd_Type) return Fetch_Return_Type;
+	function CT_Lib_Cancel(Cmd : CT_Lib_Cmd_Type) return CT_Lib_Cancel_Type;
 
-	function Sy_Describe(Cmd : Sy_Cmd_Type; Columns : Positive) return Sy_Columns_Ptr;
-	procedure Sy_Get_Data(Cmd : Sy_Cmd_Type; Values : in out Sy_Columns_Array);
+	function CT_Lib_Describe(Cmd : CT_Lib_Cmd_Type; Columns : Positive) return CT_Lib_Columns_Ptr;
+	procedure CT_Lib_Get_Data(Cmd : CT_Lib_Cmd_Type; Values : in out CT_Lib_Columns_Array);
 
-	procedure Sy_Bool_Option(Conn : Sy_Conn_Type; E : Sybase_Enum_Option; Arg : Interfaces.C.int);
-	procedure Sy_Uint_Option(Conn : Sy_Conn_Type; E : Sybase_Enum_Option; Arg : Interfaces.C.unsigned);
-	procedure Sy_DOW_Option(Conn : Sy_Conn_Type; E : Sybase_Enum_Option; Arg : Interfaces.C.int);
-	procedure Sy_Format_Option(Conn : Sy_Conn_Type; E : Sybase_Enum_Option; Arg : Interfaces.C.int);
-	procedure Sy_String_Option(Conn : Sy_Conn_Type; E : Sybase_Enum_Option; Arg : System.Address);
+	procedure CT_Lib_Bool_Option(Conn : CT_Lib_Conn_Type; E : CT_Lib_Enum_Option; Arg : Interfaces.C.int);
+	procedure CT_Lib_Uint_Option(Conn : CT_Lib_Conn_Type; E : CT_Lib_Enum_Option; Arg : Interfaces.C.unsigned);
+	procedure CT_Lib_DOW_Option(Conn : CT_Lib_Conn_Type; E : CT_Lib_Enum_Option; Arg : Interfaces.C.int);
+	procedure CT_Lib_Format_Option(Conn : CT_Lib_Conn_Type; E : CT_Lib_Enum_Option; Arg : Interfaces.C.int);
+	procedure CT_Lib_String_Option(Conn : CT_Lib_Conn_Type; E : CT_Lib_Enum_Option; Arg : System.Address);
 
 	procedure Free is new Ada.Unchecked_Deallocation(SQLCA_Type,SQLCA_Ptr);
-	procedure Free(Values : in out Sy_Columns_Ptr; Release_Array : Boolean := True);
+	procedure Free(Values : in out CT_Lib_Columns_Ptr; Release_Array : Boolean := True);
 
 
-	pragma import(C,Sy_Context_Of,"c_sy_context_of");
-	pragma import(C,Sy_Connection_Of,"c_sy_connection_of");
-	pragma import(C,Sy_Alloc_Context,"c_sy_alloc_context");
-	pragma import(C,Sy_Alloc_Connection,"c_sy_alloc_connection");
-	pragma import(C,Sy_Release,"c_sy_release");
-	pragma import(C,Sy_Fetch,"c_sy_fetch");
+	pragma import(C,CT_Lib_Context_Of,"c_ct_lib_context_of");
+	pragma import(C,CT_Lib_Connection_Of,"c_ct_lib_connection_of");
+	pragma import(C,CT_Lib_Alloc_Context,"c_ct_lib_alloc_context");
+	pragma import(C,CT_Lib_Alloc_Connection,"c_ct_lib_alloc_connection");
+	pragma import(C,CT_Lib_Release,"c_ct_lib_release");
+	pragma import(C,CT_Lib_Fetch,"c_ct_lib_fetch");
 
-end APQ.Sybase;
+end APQ.CT_Lib;
 
--- End $Source: /cvsroot/apq/apq/apq-sybase.ads-in,v $
+-- End $Source: /cvsroot/apq/apq/apq-ct_lib.ads-in,v $

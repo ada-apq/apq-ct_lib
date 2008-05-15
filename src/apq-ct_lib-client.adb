@@ -2,7 +2,7 @@
 --                                                                          --
 --                          APQ DATABASE BINDINGS                           --
 --                                                                          --
---                              A P Q - SYBASE 				    --
+--                              A P Q - CT_Lib 				    --
 --                                                                          --
 --                                 B o d y                                  --
 --                                                                          --
@@ -42,7 +42,7 @@ with Interfaces.C.Strings;
 use Ada.Exceptions;
 
 
-package body APQ.Sybase.Client is
+package body APQ.CT_Lib.Client is
 
 	type Field_Count_Type is mod 2 ** 32;
 
@@ -116,7 +116,7 @@ package body APQ.Sybase.Client is
 
 
 	--
-	-- Tell Sybase to use another database
+	-- Tell CT_Lib to use another database
 	--
 	procedure Use_Database(C : in out Connection_Type; DB_Name : String) is
 		Q : Query_Type;
@@ -188,13 +188,13 @@ package body APQ.Sybase.Client is
 
 		L : Natural;
 		X : Natural := 0;
-		E : Sybase_Enum_Option;
+		E : CT_Lib_Enum_Option;
 		T : Option_Argument_Type;
 	begin
 
-		for Y in APQ.Sybase.Options'Range loop
-			L := APQ.Sybase.Options(Y).Length;
-			if APQ.Sybase.Options(Y).Name(1..L) = Keyword then
+		for Y in APQ.CT_Lib.Options'Range loop
+			L := APQ.CT_Lib.Options(Y).Length;
+			if APQ.CT_Lib.Options(Y).Name(1..L) = Keyword then
 				X := Y;
 				exit;
 			end if;
@@ -202,11 +202,11 @@ package body APQ.Sybase.Client is
 
 		if X = 0 then
 			Raise_Exception(Failed'Identity,
-				"SY02: Unknown option '" & Keyword & "' (Sybase).");
+				"SY02: Unknown option '" & Keyword & "' (CT_Lib).");
 		end if;
 
-		E := APQ.Sybase.Options(X).Sybase_Enum;		-- Database option value
-		T := APQ.Sybase.Options(X).Argument;		-- Argument type
+		E := APQ.CT_Lib.Options(X).CT_Lib_Enum;		-- Database option value
+		T := APQ.CT_Lib.Options(X).Argument;		-- Argument type
 
 		case T is
 			when ARG_BOOLEAN =>
@@ -222,14 +222,14 @@ package body APQ.Sybase.Client is
 						Raise_Exception(Failed'Identity,
 							"SY03: Argument for option " & Keyword & " must be Boolean.");
 					end if;
-					Sy_Bool_Option(C.Connection,E,TF);
+					CT_Lib_Bool_Option(C.Connection,E,TF);
 				end;
 			when ARG_UINT =>
 				declare
 					U : unsigned;
 				begin
 					U := unsigned'Value(Argument);
-					Sy_Uint_Option(C.Connection,E,U);
+					CT_Lib_Uint_Option(C.Connection,E,U);
 				end;
 			when ARG_DAY_OF_WEEK =>
 				declare
@@ -254,7 +254,7 @@ package body APQ.Sybase.Client is
 						Raise_Exception(Failed'Identity,
 							"SY04: Option argument for " & Keyword & " must be a weekday (SUNDAY..SATURDAY).");
 					end if;
-					Sy_DOW_Option(C.Connection,E,DOW);
+					CT_Lib_DOW_Option(C.Connection,E,DOW);
 				end;
 			when ARG_DATEFORMAT =>
 				declare
@@ -277,13 +277,13 @@ package body APQ.Sybase.Client is
 						Raise_Exception(Failed'Identity,
 							"SY05: Option argument for " & Keyword & " must be of the form MDY/DMY/YMD etc.");
 					end if;
-					Sy_Format_Option(C.Connection,E,Fmt);
+					CT_Lib_Format_Option(C.Connection,E,Fmt);
 				end;
 			when ARG_CHAR_PTR =>
 				declare
 					S : char_array := To_C(Argument);
 				begin
-					Sy_String_Option(C.Connection,E,S'Address);
+					CT_Lib_String_Option(C.Connection,E,S'Address);
 				end;
 			when ARG_CHAR_PTR_NULL =>
 				declare
@@ -291,9 +291,9 @@ package body APQ.Sybase.Client is
 					S :	char_array := To_C(Argument);
 				begin
 					if UC = "NULL" then
-						Sy_String_Option(C.Connection,E,System.Null_Address);
+						CT_Lib_String_Option(C.Connection,E,System.Null_Address);
 					else
-						Sy_String_Option(C.Connection,E,S'Address);
+						CT_Lib_String_Option(C.Connection,E,S'Address);
 					end if;
 				end;
 		end case;
@@ -322,7 +322,7 @@ package body APQ.Sybase.Client is
 		Do_Commit : Boolean := False;
 	begin
 
-		Free(C.Sy_Database);		-- Free this string, if any
+		Free(C.CT_Lib_Database);		-- Free this string, if any
 		Clear_Error(C);			-- Clear errors
 
 		if C.Connection /= Null_Connection then
@@ -388,7 +388,7 @@ package body APQ.Sybase.Client is
 
 	function Engine_Of(C : Connection_Type) return Database_Type is
 	begin
-		return Engine_Sybase;
+		return Engine_CT_Lib;
 	end Engine_Of;
 
 
@@ -403,7 +403,7 @@ package body APQ.Sybase.Client is
 	--
 	-- Set the Database Name to be used:
 	--
-	--	 For Sybase, this is ignored at connection time. We make
+	--	 For CT_Lib, this is ignored at connection time. We make
 	--	 note of the application wishes if not connected, until a
 	--	 query is ready to be executed. Then the database is changed.
 	--	 
@@ -414,7 +414,7 @@ package body APQ.Sybase.Client is
 	procedure Set_DB_Name(C : in out Connection_Type; DB_Name : String) is
 	begin
 		if not Is_Connected(C) then
-			C.Sy_Database := new String'(To_Case(DB_Name,C.SQL_Case));
+			C.CT_Lib_Database := new String'(To_Case(DB_Name,C.SQL_Case));
 		else
 			Use_Database(C,DB_Name);	-- Use the specified database
 			Set_DB_Name(Root_Connection_Type(C),To_Case(DB_Name,C.SQL_Case));
@@ -459,14 +459,14 @@ package body APQ.Sybase.Client is
 				"SY06: Already connected (Connect).");
 		end if;
 
-		if  Sy_Set_Hostname(C.Connection,C.Host_Name)		-- Configure host name
-		and Sy_Set_Userid(C.Connection,C.User_Name)		-- Configure userid
-		and Sy_Set_Passwd(C.Connection,C.User_Password)		-- Configure password
-		and Sy_Set_Database(C.Connection,C.DB_Name) then	-- Configure database(application) name
+		if  CT_Lib_Set_Hostname(C.Connection,C.Host_Name)		-- Configure host name
+		and CT_Lib_Set_Userid(C.Connection,C.User_Name)		-- Configure userid
+		and CT_Lib_Set_Passwd(C.Connection,C.User_Password)		-- Configure password
+		and CT_Lib_Set_Database(C.Connection,C.DB_Name) then	-- Configure database(application) name
 			if C.Instance /= null then
-				C.Connected := Sy_Connect(C.Connection,C.Instance.all);	-- Connect
+				C.Connected := CT_Lib_Connect(C.Connection,C.Instance.all);	-- Connect
 			else
-				C.Connected := Sy_Connect(C.Connection,"");
+				C.Connected := CT_Lib_Connect(C.Connection,"");
 			end if;
 		end if;
 
@@ -481,13 +481,13 @@ package body APQ.Sybase.Client is
 			--
 			-- See if we have a pending database change
 			--
-			if C.Sy_Database /= null then
+			if C.CT_Lib_Database /= null then
 				declare
 					Use_Raised : Boolean := False;
-					Use_DB_Name : String := To_Case(C.Sy_Database.all,C.SQL_Case);
+					Use_DB_Name : String := To_Case(C.CT_Lib_Database.all,C.SQL_Case);
 				begin
 					begin
-						Free(C.Sy_Database);
+						Free(C.CT_Lib_Database);
 						Use_Database(C,Use_DB_Name);
 					exception
 						when APQ.Use_Error =>
@@ -554,7 +554,7 @@ package body APQ.Sybase.Client is
 	begin
 		if C.Connection /= Null_Connection then
 			if C.Connected then
-				if not Sy_Disconnect(C.Connection) then
+				if not CT_Lib_Disconnect(C.Connection) then
 					C.Connection := Null_Connection;
 					Raise_Exception(Not_Connected'Identity,
 						"SY09: Not connected (Disconnect).");
@@ -614,7 +614,7 @@ package body APQ.Sybase.Client is
 		end if;
 
 		Ada.Text_IO.Create(C.Trace_Ada,Append_File,Filename,Form => "shared=yes");
-		C.Trace_File := CStr.Null_Stream;		-- Not used for Sybase
+		C.Trace_File := CStr.Null_Stream;		-- Not used for CT_Lib
 
 		Ada.Text_IO.Put_Line(C.Trace_Ada,"-- Start of Trace, Mode = " & Trace_Mode_Type'Image(Mode));
 
@@ -639,7 +639,7 @@ package body APQ.Sybase.Client is
 		Free(C.Trace_Filename);
 
 		Ada.Text_IO.Put_Line(C.Trace_Ada,"-- End of Trace.");
-		Ada.Text_IO.Close(C.Trace_Ada);	-- C.Trace_File is not used for APQ.Sybase
+		Ada.Text_IO.Close(C.Trace_Ada);	-- C.Trace_File is not used for APQ.CT_Lib
 
 		C.Trace_Mode	:= Trace_None;
 		C.Trace_On	:= True;		-- Restore default
@@ -718,7 +718,7 @@ package body APQ.Sybase.Client is
 				when No_Results =>
 					null;
 				when Row_Results =>
-					case Sy_Cancel(Q.Cmd) is
+					case CT_Lib_Cancel(Q.Cmd) is
 						when Cancel_Failed =>
 							raise Program_Error;
 						when Cancel_Succeeded =>
@@ -727,18 +727,18 @@ package body APQ.Sybase.Client is
 							raise Program_Error;
 					end case;
 				when Cursor_Results =>
-					case Sy_Cancel(Q.Cmd) is
+					case CT_Lib_Cancel(Q.Cmd) is
 						when Cancel_Failed =>
 							raise Program_Error;
 						when Cancel_Succeeded =>
 							null;
 						when Cancel_With_Open_Cursor =>
-							if not Sy_Close_Cursor(Q.Cmd) then
+							if not CT_Lib_Close_Cursor(Q.Cmd) then
 								raise Program_Error;		-- Cursor failed to close
 							end if;
 					end case;
 				when Info_Results =>
-					case Sy_Cancel(Q.Cmd) is
+					case CT_Lib_Cancel(Q.Cmd) is
 						when Cancel_Failed =>
 							raise Program_Error;
 						when Cancel_Succeeded =>
@@ -747,7 +747,7 @@ package body APQ.Sybase.Client is
 							raise Program_Error;
 					end case;
 				when Compute_Results =>			
-					case Sy_Cancel(Q.Cmd) is
+					case CT_Lib_Cancel(Q.Cmd) is
 						when Cancel_Failed =>
 							raise Program_Error;
 						when Cancel_Succeeded =>
@@ -756,7 +756,7 @@ package body APQ.Sybase.Client is
 							raise Program_Error;
 					end case;
 				when Param_Results =>
-					case Sy_Cancel(Q.Cmd) is
+					case CT_Lib_Cancel(Q.Cmd) is
 						when Cancel_Failed =>
 							raise Program_Error;
 						when Cancel_Succeeded =>
@@ -765,7 +765,7 @@ package body APQ.Sybase.Client is
 							raise Program_Error;
 					end case;
 				when Status_Results =>
-					case Sy_Cancel(Q.Cmd) is
+					case CT_Lib_Cancel(Q.Cmd) is
 						when Cancel_Failed =>
 							raise Program_Error;
 						when Cancel_Succeeded =>
@@ -775,7 +775,7 @@ package body APQ.Sybase.Client is
 					end case;
 			end case;
 
-			Q.Cmd := Sy_Release(Q.Cmd);
+			Q.Cmd := CT_Lib_Release(Q.Cmd);
 			if Q.Cmd /= Null_Command then
 				raise Program_Error;
 			end if;
@@ -878,7 +878,7 @@ package body APQ.Sybase.Client is
 				Set_Fetch_Mode(Root_Query_Type(Q),Mode);
 			when Random_Fetch =>
 				Raise_Exception(Not_Supported'Identity,
-					"SY48: Random_Fetch mode is not yet supported for Sybase in APQ (Set_Fetch_Mode).");
+					"SY48: Random_Fetch mode is not yet supported for CT_Lib in APQ (Set_Fetch_Mode).");
 		end case;
 
 	end Set_Fetch_Mode;
@@ -923,20 +923,20 @@ package body APQ.Sybase.Client is
 
 			case Query.Mode is
 				when Sequential_Fetch =>
-					Query.Cmd := Sy_Exec(Connection_Type(Connection).Connection,SQL);
+					Query.Cmd := CT_Lib_Exec(Connection_Type(Connection).Connection,SQL);
 				when Random_Fetch =>
 					raise Program_Error;			-- Set_Fetch_Mode should disallow this anyway
 				when Cursor_For_Update =>
 					if Connection_Type(Connection).Trace_On then
 						Ada.Text_IO.Put_Line(Connection.Trace_Ada,"-- Cursor:  " & String(Query.Cursor_Name));
 					end if;
-					Query.Cmd := Sy_Open_Cursor(Connection_Type(Connection).Connection,SQL,
+					Query.Cmd := CT_Lib_Open_Cursor(Connection_Type(Connection).Connection,SQL,
 						Query.Cursor_Name'Address,Query.Cursor_Name'Length,For_Update => True);
 				when Cursor_For_Read_Only =>
 					if Connection_Type(Connection).Trace_On then
 						Ada.Text_IO.Put_Line(Connection.Trace_Ada,"-- Cursor:  " & String(Query.Cursor_Name));
 					end if;
-					Query.Cmd := Sy_Open_Cursor(Connection_Type(Connection).Connection,SQL,
+					Query.Cmd := CT_Lib_Open_Cursor(Connection_Type(Connection).Connection,SQL,
 						Query.Cursor_Name'Address,Query.Cursor_Name'Length,For_Update => False);
 			end case;
 		end;
@@ -948,7 +948,7 @@ package body APQ.Sybase.Client is
 			Connection_Type(Connection).SQLCA.Post_Once := True;		-- Post only the first occuring error
 			Connection_Type(Connection).SQLCA.Posted := False;		-- Accept new error information
 
-			Sy_Results(Query.Cmd,Query.Results,Query.Columns);
+			CT_Lib_Results(Query.Cmd,Query.Results,Query.Columns);
 			Query.SQLCA := Connection_Type(Connection).SQLCA;
 
 			if Connection.Trace_On then
@@ -965,7 +965,7 @@ package body APQ.Sybase.Client is
 					if Is_Select(Query) then	-- Is this test really needed now???
 						Raise_Exception(SQL_Error'Identity,
 							"SY14: No results were returned from a SELECT (Execute).");
-					elsif Sy_Is_End(Query.Cmd) then
+					elsif CT_Lib_Is_End(Query.Cmd) then
 						if Is_Insert(Query) then
 							--
 							-- Last successful SQL statement was an INSERT statement. We
@@ -1000,7 +1000,7 @@ package body APQ.Sybase.Client is
 						Ada.Text_IO.Put_Line(Connection_Type(Connection).Trace_Ada,
 							"-- Columns in result:" & Natural'Image(Query.Columns));
 					end if;
-					Query.Values := Sy_Describe(Query.Cmd,Query.Columns);
+					Query.Values := CT_Lib_Describe(Query.Cmd,Query.Columns);
 				when Compute_Results | Param_Results | Status_Results =>
 					raise Program_Error;			-- These should not be seen here
 			end case;
@@ -1142,16 +1142,16 @@ package body APQ.Sybase.Client is
 		Q.SQLCA.Post_Once := True;
 		Q.SQLCA.Posted := False;
 
-		R := Sy_Fetch(Q.Cmd);
+		R := CT_Lib_Fetch(Q.Cmd);
 
 		case R is
 			when Fetch_Row =>
-				Sy_Get_Data(Q.Cmd,Q.Values.all);
+				CT_Lib_Get_Data(Q.Cmd,Q.Values.all);
 			when Fetch_End =>
 				if Q.Results = Cursor_Results or else Q.Results = Row_Results then
-					if Sy_Is_Done(Q.Cmd) then
+					if CT_Lib_Is_Done(Q.Cmd) then
 						if Q.Results = Cursor_Results then
-							if not Sy_Close_Cursor(Q.Cmd) then
+							if not CT_Lib_Close_Cursor(Q.Cmd) then
 								raise Program_Error;
 							end if;
 						end if;
@@ -1174,7 +1174,7 @@ package body APQ.Sybase.Client is
 	procedure Fetch(Q : in out Query_Type; TX : Tuple_Index_Type) is
 	begin
 		Raise_Exception(Not_Supported'Identity,
-			"SY28: APQ does not yet support random fetch mode for Sybase (Fetch).");
+			"SY28: APQ does not yet support random fetch mode for CT_Lib (Fetch).");
 	end Fetch;
 
 
@@ -1182,7 +1182,7 @@ package body APQ.Sybase.Client is
 	function End_of_Query(Q : Query_Type) return Boolean is
 	begin
 		Raise_Exception(Not_Supported'Identity,
-			"SY30: End_Of_Query is not supported for Sybase and should be avoided for all (End_of_Query).");
+			"SY30: End_Of_Query is not supported for CT_Lib and should be avoided for all (End_of_Query).");
 		return True;		-- To quiet the compiler only
 	end End_of_Query;
 
@@ -1207,7 +1207,7 @@ package body APQ.Sybase.Client is
 				"SY31: There are no row results (Tuples).");
 		end if;
 		Raise_Exception(Not_Supported'Identity,
-			"SY32: Sybase will not report in advance how many rows are being returned (Tuples).");
+			"SY32: CT_Lib will not report in advance how many rows are being returned (Tuples).");
 		return 0;		-- To quiet compiler
 	end Tuples;
 
@@ -1385,7 +1385,7 @@ package body APQ.Sybase.Client is
 	function Null_Oid(Query : Query_Type) return Row_ID_Type is
 	begin
 		Raise_Exception(Not_Supported'Identity,
-			"SY46: Sybase does not support row id values (Null_Oid).");
+			"SY46: CT_Lib does not support row id values (Null_Oid).");
 		return Row_ID_Type'First;		-- For compiler only
 	end Null_Oid;
 
@@ -1421,7 +1421,7 @@ package body APQ.Sybase.Client is
 
 	function Engine_Of(Q : Query_Type) return Database_Type is
 	begin
-		return Engine_Sybase;
+		return Engine_CT_Lib;
 	end Engine_Of;
 
 
@@ -1459,21 +1459,21 @@ package body APQ.Sybase.Client is
 
 
 	--
-	-- This is the Client Error callback (from c_sybase.c)
+	-- This is the Client Error callback (from c_ct_lib.c)
 	--
-	procedure Sy_Client_CB(
+	procedure CT_Lib_Client_CB(
 		Connection :		System.Address;
-		Message_Layer :		APQ.Sybase.Layer_Type;
-		Message_Origin :	APQ.Sybase.Origin_Type;
-		Message_Severity :	APQ.Sybase.Severity_Type;
-		Message_Number :	APQ.Sybase.Message_Number_Type;
+		Message_Layer :		APQ.CT_Lib.Layer_Type;
+		Message_Origin :	APQ.CT_Lib.Origin_Type;
+		Message_Severity :	APQ.CT_Lib.Severity_Type;
+		Message_Number :	APQ.CT_Lib.Message_Number_Type;
 		Message :		Interfaces.C.Strings.chars_ptr;
-		Message_Length :	APQ.Sybase.Int_Type;
+		Message_Length :	APQ.CT_Lib.Int_Type;
 		OS_Message :		Interfaces.C.Strings.chars_ptr;
-		OS_Message_Length :	APQ.Sybase.Int_Type
+		OS_Message_Length :	APQ.CT_Lib.Int_Type
 	) is
 		use Ada.Text_IO;
-		Conn_Ptr : Conn_Addr.Object_Pointer := Conn_Addr.To_Pointer(Sy_Client_CB.Connection);
+		Conn_Ptr : Conn_Addr.Object_Pointer := Conn_Addr.To_Pointer(CT_Lib_Client_CB.Connection);
 	begin
 
 		if Message_Number = 155 then
@@ -1486,10 +1486,10 @@ package body APQ.Sybase.Client is
 			New_Line(Conn_Ptr.Trace_Ada);
 			Put_Line(Conn_Ptr.Trace_Ada,"--");
 			Put_Line(Conn_Ptr.Trace_Ada,"-- Client Error Message:");
-			Put_Line(Conn_Ptr.Trace_Ada,"--      Layer:" & APQ.Sybase.Layer_Type'Image(Message_Layer));
-			Put_Line(Conn_Ptr.Trace_Ada,"--     Origin:" & APQ.Sybase.Origin_Type'Image(Message_Origin));
-			Put_Line(Conn_Ptr.Trace_Ada,"--   Severity:" & APQ.Sybase.Severity_Type'Image(Message_Severity));
-			Put_Line(Conn_Ptr.Trace_Ada,"--     Number:" & APQ.Sybase.Message_Number_Type'Image(Message_Number));
+			Put_Line(Conn_Ptr.Trace_Ada,"--      Layer:" & APQ.CT_Lib.Layer_Type'Image(Message_Layer));
+			Put_Line(Conn_Ptr.Trace_Ada,"--     Origin:" & APQ.CT_Lib.Origin_Type'Image(Message_Origin));
+			Put_Line(Conn_Ptr.Trace_Ada,"--   Severity:" & APQ.CT_Lib.Severity_Type'Image(Message_Severity));
+			Put_Line(Conn_Ptr.Trace_Ada,"--     Number:" & APQ.CT_Lib.Message_Number_Type'Image(Message_Number));
 			Put_Line(Conn_Ptr.Trace_Ada,"--    Message: " & Value_Of(Message));
 			if OS_Message_Length > 0 then
 				Put_Line(Conn_Ptr.Trace_Ada,"-- O/S Message: " & Value_Of(OS_Message));
@@ -1506,33 +1506,33 @@ package body APQ.Sybase.Client is
 			Conn_Ptr.SQLCA.Sqlwarn := (' ', others => ' ');
 			Conn_Ptr.SQLCA.Posted := True;
 		end if;
-	end Sy_Client_CB;
+	end CT_Lib_Client_CB;
 
 
 
-	procedure Sy_Server_CB(
+	procedure CT_Lib_Server_CB(
 		Connection :		System.Address;
-		Message_Severity :	APQ.Sybase.Severity_Type;
-		Message_Number :	APQ.Sybase.Message_Number_Type;
-		State :			APQ.Sybase.State_Type;
-		Line :			APQ.Sybase.Line_Type;
+		Message_Severity :	APQ.CT_Lib.Severity_Type;
+		Message_Number :	APQ.CT_Lib.Message_Number_Type;
+		State :			APQ.CT_Lib.State_Type;
+		Line :			APQ.CT_Lib.Line_Type;
 		Server_Name :		Interfaces.C.Strings.chars_ptr;
-		Server_Name_Length :	APQ.Sybase.Int_Type;
+		Server_Name_Length :	APQ.CT_Lib.Int_Type;
 		Proc_Name :		Interfaces.C.Strings.chars_ptr;
-		Proc_Name_Length :	APQ.Sybase.Int_Type;
+		Proc_Name_Length :	APQ.CT_Lib.Int_Type;
 		Message :		Interfaces.C.Strings.chars_ptr
 	) is
 		use Ada.Text_IO;
-		Conn_Ptr : Conn_Addr.Object_Pointer := Conn_Addr.To_Pointer(Sy_Server_CB.Connection);
+		Conn_Ptr : Conn_Addr.Object_Pointer := Conn_Addr.To_Pointer(CT_Lib_Server_CB.Connection);
 	begin
 		if Conn_Ptr.Trace_On then
 			New_Line(Conn_Ptr.Trace_Ada);
 			Put_Line(Conn_Ptr.Trace_Ada,"--");
 			Put_Line(Conn_Ptr.Trace_Ada,"-- Server Error Message:");
-			Put_Line(Conn_Ptr.Trace_Ada,"--   Severity:" & APQ.Sybase.Severity_Type'Image(Message_Severity));
-			Put_Line(Conn_Ptr.Trace_Ada,"--     Number:" & APQ.Sybase.Message_Number_Type'Image(Message_Number));
-			Put_Line(Conn_Ptr.Trace_Ada,"--      State:" & APQ.Sybase.State_Type'Image(State));
-			Put_Line(Conn_Ptr.Trace_Ada,"--       Line:" & APQ.Sybase.Line_Type'Image(Line));
+			Put_Line(Conn_Ptr.Trace_Ada,"--   Severity:" & APQ.CT_Lib.Severity_Type'Image(Message_Severity));
+			Put_Line(Conn_Ptr.Trace_Ada,"--     Number:" & APQ.CT_Lib.Message_Number_Type'Image(Message_Number));
+			Put_Line(Conn_Ptr.Trace_Ada,"--      State:" & APQ.CT_Lib.State_Type'Image(State));
+			Put_Line(Conn_Ptr.Trace_Ada,"--       Line:" & APQ.CT_Lib.Line_Type'Image(Line));
 			if Server_Name_Length > 0 then
 				Put_Line(Conn_Ptr.Trace_Ada,"-- Server Name: " & Value_Of(Server_Name));
 			end if;
@@ -1566,7 +1566,7 @@ package body APQ.Sybase.Client is
 			Conn_Ptr.SQLCA.Posted := True;
 		end if;
 
-		if Message_Number = Sy_Change_Database_Context then
+		if Message_Number = CT_Lib_Change_Database_Context then
 			declare
 				Prefix : constant String := "Changed database context to '";
 			begin
@@ -1584,7 +1584,7 @@ package body APQ.Sybase.Client is
 				end if;
 			end;
 		end if;
-	end Sy_Server_CB;
+	end CT_Lib_Server_CB;
 
 
 
@@ -1605,10 +1605,10 @@ package body APQ.Sybase.Client is
 	begin
 		Internal_Reset(C,True);
 		if C.Connection /= Null_Connection then
-			Sy_Free_Connection(C.Connection);
+			CT_Lib_Free_Connection(C.Connection);
 		end if;
 		if C.Context /= Null_Context then
-			Sy_Free_Context(C.Context);
+			CT_Lib_Free_Context(C.Context);
 		end if;
 		if C.SQLCA /= null then
 			Free(C.SQLCA);
@@ -1620,15 +1620,15 @@ package body APQ.Sybase.Client is
 	procedure Initialize(C : in out Connection_Type) is
 	begin
 		C.SQL_Case	:= Lower_Case;			-- Lowercase all SQL text
-		C.Context	:= Sy_Alloc_Context;		-- CS_CONTEXT
+		C.Context	:= CT_Lib_Alloc_Context;		-- CS_CONTEXT
 		if C.Context = Null_Context then
 			Raise_Exception(Failed'Identity,
 				"SY10: Failed to initialize Connection_Type (Check LANG environment variable).");
 		end if;
-		C.Connection := Sy_Alloc_Connection(C.Context,C'Address); -- CS_CONNECTION
+		C.Connection := CT_Lib_Alloc_Connection(C.Context,C'Address); -- CS_CONNECTION
 		if C.Connection = Null_Connection then
 			Raise_Exception(Failed'Identity,
-				"SY11: Failed to allocate a Sybase connection object (Check environment).");
+				"SY11: Failed to allocate a CT_Lib connection object (Check environment).");
 		end if;
 		C.Connected	:= False;
 		C.SQLCA		:= new SQLCA_Type;		-- SQL Communications Area
@@ -1648,7 +1648,7 @@ package body APQ.Sybase.Client is
 	procedure Initialize(Q : in out Query_Type) is
 	begin
 		Initialize(Root_Query_Type(Q));
-		Q.SQL_Case := Lower_Case;			-- Lowercase all SQL query text for Sybase
+		Q.SQL_Case := Lower_Case;			-- Lowercase all SQL query text for CT_Lib
 		Q.Mode := Sequential_Fetch;			-- By default, assume efficient mode
 		Q.Row_ID := Null_Row_ID;
 		Name_Generator.Generate(Q,Q.Cursor_Name);	-- Generate a cursor name
@@ -1673,7 +1673,7 @@ package body APQ.Sybase.Client is
 		exception
 			when Failed | Program_Error =>
 				if Q.Cmd /= Null_Command then
-					Q.Cmd := Sy_Release(Q.Cmd);
+					Q.Cmd := CT_Lib_Release(Q.Cmd);
 					if Q.Cmd /= Null_Command then
 						Q.Cmd := Null_Command;
 					end if;
@@ -1687,27 +1687,27 @@ package body APQ.Sybase.Client is
 
 
 	procedure Set_Client_CB(Proc : Client_Msg_CB) is
-		procedure Sy_Reg_ClientMsgCB(Proc : Client_Msg_CB);
-		pragma import(C,Sy_Reg_ClientMsgCB,"c_sy_reg_clientmsgcb");
+		procedure CT_Lib_Reg_ClientMsgCB(Proc : Client_Msg_CB);
+		pragma import(C,CT_Lib_Reg_ClientMsgCB,"c_ct_lib_reg_clientmsgcb");
 	begin
-		Sy_Reg_ClientMsgCB(Proc);
+		CT_Lib_Reg_ClientMsgCB(Proc);
 	end Set_Client_CB;
 
 
 
 	procedure Set_Server_CB(Proc : Server_Msg_CB) is
-		procedure Sy_Reg_ServerMsgCB(Proc : Server_Msg_CB);
-		pragma import(C,Sy_Reg_ServerMsgCB,"c_sy_reg_servermsgcb");
+		procedure CT_Lib_Reg_ServerMsgCB(Proc : Server_Msg_CB);
+		pragma import(C,CT_Lib_Reg_ServerMsgCB,"c_ct_lib_reg_servermsgcb");
 	begin
-		Sy_Reg_ServerMsgCB(Proc);
+		CT_Lib_Reg_ServerMsgCB(Proc);
 	end Set_Server_CB;
 
 
 
 begin
 
-	Set_Client_CB(Sy_Client_CB'Access);
-	Set_Server_CB(Sy_Server_CB'Access);
+	Set_Client_CB(CT_Lib_Client_CB'Access);
+	Set_Server_CB(CT_Lib_Server_CB'Access);
 
-end APQ.Sybase.Client;
+end APQ.CT_Lib.Client;
 

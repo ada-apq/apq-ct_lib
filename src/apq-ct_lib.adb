@@ -36,7 +36,7 @@ with Ada.Strings.Unbounded;
 
 use Ada.Exceptions;
 
-package body APQ.Sybase is
+package body APQ.CT_Lib is
 
 	No_Warnings : constant String(1..6) := "      ";
 
@@ -68,166 +68,166 @@ package body APQ.Sybase is
 	--
 	-- FREE SYBASE CONTEXT
 	--
-	procedure Sy_Free_Context(Ctx : in out Sy_Context_Type) is
-		function c_sy_free_context(Ctx : Sy_Context_Type) return Sy_Context_Type;
-		pragma import(C,c_sy_free_context,"c_sy_free_context");
+	procedure CT_Lib_Free_Context(Ctx : in out CT_Lib_Context_Type) is
+		function c_ct_lib_free_context(Ctx : CT_Lib_Context_Type) return CT_Lib_Context_Type;
+		pragma import(C,c_ct_lib_free_context,"c_ct_lib_free_context");
 	begin
-		Ctx := c_sy_free_context(Ctx);
-	end Sy_Free_Context;
+		Ctx := c_ct_lib_free_context(Ctx);
+	end CT_Lib_Free_Context;
 
 
 	--
 	-- FREE SYBASE CONNECTION
 	--
-	procedure Sy_Free_Connection(Conn : in out Sy_Conn_Type) is
-		function c_sy_free_connection(Conn : Sy_Conn_Type) return Sy_Conn_Type;
-		pragma import(C,c_sy_free_connection,"c_sy_free_connection");
+	procedure CT_Lib_Free_Connection(Conn : in out CT_Lib_Conn_Type) is
+		function c_ct_lib_free_connection(Conn : CT_Lib_Conn_Type) return CT_Lib_Conn_Type;
+		pragma import(C,c_ct_lib_free_connection,"c_ct_lib_free_connection");
 	begin
-		Conn := c_sy_free_connection(Conn);
-	end Sy_Free_Connection;
+		Conn := c_ct_lib_free_connection(Conn);
+	end CT_Lib_Free_Connection;
 
 
 	--
 	-- SET HOSTNAME TO USE FOR CONNECTION
 	--
-	function Sy_Set_Hostname(Conn : Sy_Conn_Type; Host : String_Ptr) return Boolean is
+	function CT_Lib_Set_Hostname(Conn : CT_Lib_Conn_Type; Host : String_Ptr) return Boolean is
 		use Interfaces.C.Strings;
-		function c_sy_set_hostname(Conn : Sy_Conn_Type; host : System.Address) return Return_Status;
-		pragma import(C,c_sy_set_hostname,"c_sy_set_hostname");
+		function c_ct_lib_set_hostname(Conn : CT_Lib_Conn_Type; host : System.Address) return Return_Status;
+		pragma import(C,c_ct_lib_set_hostname,"c_ct_lib_set_hostname");
 		C_Host :	char_array_access;
 		A_Host :	System.Address := System.Null_Address;
 		RC :		Return_Status;
 	begin
 		C_String(To_String(Host),C_Host,A_Host);
-		RC := c_sy_set_hostname(Conn,A_Host);
+		RC := c_ct_lib_set_hostname(Conn,A_Host);
 		if C_Host /= null then
 			Free(C_Host);
 		end if;
 		return RC /= 0;
-	end Sy_Set_Hostname;
+	end CT_Lib_Set_Hostname;
 
 
 	--
 	-- SET SYBASE USERID
 	--
-	function Sy_Set_Userid(Conn : Sy_Conn_Type; Userid : String_Ptr) return Boolean is
+	function CT_Lib_Set_Userid(Conn : CT_Lib_Conn_Type; Userid : String_Ptr) return Boolean is
 		use Interfaces.C.Strings;
-		function c_sy_set_userid(Conn : Sy_Conn_Type; userid : System.Address) return Return_Status;
-		pragma import(C,c_sy_set_userid,"c_sy_set_userid");
+		function c_ct_lib_set_userid(Conn : CT_Lib_Conn_Type; userid : System.Address) return Return_Status;
+		pragma import(C,c_ct_lib_set_userid,"c_ct_lib_set_userid");
 		C_Userid :	char_array_access;
 		A_Userid :	System.Address;
 		RC :		Return_Status;
 	begin
 		C_String(To_String(Userid),C_Userid,A_Userid);
-		RC := c_sy_set_userid(Conn,A_Userid);
+		RC := c_ct_lib_set_userid(Conn,A_Userid);
 		if C_Userid /= null then
 			Free(C_Userid);
 		end if;
 		return RC /= 0;
-	end Sy_Set_Userid;
+	end CT_Lib_Set_Userid;
 
 
 	--
 	-- SET THE PASSWORD TO USE
 	--
-	function Sy_Set_Passwd(Conn : Sy_Conn_Type; Passwd : String_Ptr) return Boolean is
+	function CT_Lib_Set_Passwd(Conn : CT_Lib_Conn_Type; Passwd : String_Ptr) return Boolean is
 		use Interfaces.C.Strings;
-		function c_sy_set_passwd(Conn : Sy_Conn_Type; passwd : System.Address) return Return_Status;
-		pragma import(C,c_sy_set_passwd,"c_sy_set_passwd");
+		function c_ct_lib_set_passwd(Conn : CT_Lib_Conn_Type; passwd : System.Address) return Return_Status;
+		pragma import(C,c_ct_lib_set_passwd,"c_ct_lib_set_passwd");
 		C_Passwd :	char_array_access;
 		A_Passwd :	System.Address;
 		RC :		Return_Status;
 	begin
 		C_String(To_String(Passwd),C_Passwd,A_Passwd);
-		RC := c_sy_set_passwd(Conn,A_Passwd);
+		RC := c_ct_lib_set_passwd(Conn,A_Passwd);
 		if C_Passwd /= null then
 			Free(C_Passwd);
 		end if;
 		return RC /= 0;
-	end Sy_Set_Passwd;
+	end CT_Lib_Set_Passwd;
 
 
 	--
 	-- SET THE DATABASE NAME TO USE
 	--
-	function Sy_Set_Database(Conn : Sy_Conn_Type; Database : String_Ptr) return Boolean is
+	function CT_Lib_Set_Database(Conn : CT_Lib_Conn_Type; Database : String_Ptr) return Boolean is
 		use Interfaces.C.Strings;
-		function c_sy_set_database(Conn : Sy_Conn_Type; database : System.Address) return Return_Status;
-		pragma import(C,c_sy_set_database,"c_sy_set_database");
+		function c_ct_lib_set_database(Conn : CT_Lib_Conn_Type; database : System.Address) return Return_Status;
+		pragma import(C,c_ct_lib_set_database,"c_ct_lib_set_database");
 		C_Db :	char_array_access;
 		A_Db :	System.Address;
 		RC :	Return_Status;
 	begin
 		C_String(To_String(Database),C_Db,A_Db);
-		RC := c_sy_set_database(Conn,A_Db);
+		RC := c_ct_lib_set_database(Conn,A_Db);
 		if C_Db /= null then
 			Free(C_Db);
 		end if;
 		return RC /= 0;
-	end Sy_Set_Database;
+	end CT_Lib_Set_Database;
 
 
 	--
 	-- CONNECT TO THE SYBASE SERVER
 	--
-	function Sy_Connect(Conn : Sy_Conn_Type; Instance : String) return Boolean is
+	function CT_Lib_Connect(Conn : CT_Lib_Conn_Type; Instance : String) return Boolean is
 		use Interfaces.C.Strings;
-		function c_sy_connect(Conn : Sy_Conn_Type; instance : System.Address) return Return_Status;
-		pragma import(C,c_sy_connect,"c_sy_connect");
+		function c_ct_lib_connect(Conn : CT_Lib_Conn_Type; instance : System.Address) return Return_Status;
+		pragma import(C,c_ct_lib_connect,"c_ct_lib_connect");
 		C_Instance :	char_array_access;
 		A_Instance :	System.Address;
 		RC :		Return_Status;
 	begin
 		C_String(Instance,C_Instance,A_Instance);
-		RC := c_sy_connect(Conn,A_Instance);
+		RC := c_ct_lib_connect(Conn,A_Instance);
 		if C_Instance /= null then
 			Free(C_Instance);
 		end if;
 		return RC /= 0;
-	end Sy_Connect;
+	end CT_Lib_Connect;
 
 
 	--
 	-- DISCONNECT FROM THE SYBASE SERVER
 	--
-	function Sy_Disconnect(Conn : Sy_Conn_Type) return Boolean is
-		function c_sy_disconnect(Conn : Sy_Conn_Type) return Return_Status;
-		pragma import(C,c_sy_disconnect,"c_sy_disconnect");
+	function CT_Lib_Disconnect(Conn : CT_Lib_Conn_Type) return Boolean is
+		function c_ct_lib_disconnect(Conn : CT_Lib_Conn_Type) return Return_Status;
+		pragma import(C,c_ct_lib_disconnect,"c_ct_lib_disconnect");
 		RC : Return_Status;
 	begin
-		RC := c_sy_disconnect(Conn);
+		RC := c_ct_lib_disconnect(Conn);
 		return RC /= 0;
-	end Sy_Disconnect;
+	end CT_Lib_Disconnect;
 
 
 	--
 	-- ALLOCATE A SYBASE CS_COMMAND, SEND SQL TO SERVER, AND EXECUTE IT
 	--
-	function Sy_Exec(Conn : Sy_Conn_Type; SQL : String) return Sy_Cmd_Type is
+	function CT_Lib_Exec(Conn : CT_Lib_Conn_Type; SQL : String) return CT_Lib_Cmd_Type is
 		use Interfaces.C;
-		function c_sy_exec(conn : Sy_Conn_Type; SQL : System.Address) return Sy_Cmd_Type;
-		pragma import(C,c_sy_exec,"c_sy_exec");
+		function c_ct_lib_exec(conn : CT_Lib_Conn_Type; SQL : System.Address) return CT_Lib_Cmd_Type;
+		pragma import(C,c_ct_lib_exec,"c_ct_lib_exec");
 		C_SQL : char_array := To_C(SQL);
 	begin
-		return c_sy_exec(Conn,C_SQL'Address);
-	end Sy_Exec;
+		return c_ct_lib_exec(Conn,C_SQL'Address);
+	end CT_Lib_Exec;
 
 
 	--
 	-- OPEN AN SQL CURSOR
 	--
-	function Sy_Open_Cursor(
-		Conn :		Sy_Conn_Type;		-- Sybase connection
+	function CT_Lib_Open_Cursor(
+		Conn :		CT_Lib_Conn_Type;		-- Sybase connection
 		SQL :		String;			-- SQL text
 		Cursor_Name :	System.Address;		-- Start of cursor name
 		Name_Length :	Natural;		-- Length of cursor name
 		For_Update :	Boolean			-- True if cursor is for update
-	) return Sy_Cmd_Type is
+	) return CT_Lib_Cmd_Type is
 		use Interfaces.C;
 
-		function c_sy_cursor(Conn : Sy_Conn_Type; Name : System.Address; Name_Len : Int_Type; SQL : System.Address; For_Update : Int_Type)
-			return Sy_Cmd_Type;
-		pragma import(C,c_sy_cursor,"c_sy_cursor");
+		function c_ct_lib_cursor(Conn : CT_Lib_Conn_Type; Name : System.Address; Name_Len : Int_Type; SQL : System.Address; For_Update : Int_Type)
+			return CT_Lib_Cmd_Type;
+		pragma import(C,c_ct_lib_cursor,"c_ct_lib_cursor");
 
 		C_SQL :		char_array := To_C(SQL);
 		Update :	Int_Type := 0;
@@ -235,78 +235,78 @@ package body APQ.Sybase is
 		if For_Update then
 			Update := 1;
 		end if;
-		return c_sy_cursor(Conn,Cursor_Name,Int_Type(Name_Length),C_SQL'Address,Update);
-	end Sy_Open_Cursor;
+		return c_ct_lib_cursor(Conn,Cursor_Name,Int_Type(Name_Length),C_SQL'Address,Update);
+	end CT_Lib_Open_Cursor;
 
 
 	--
-	-- CLOSE & DEALLOCATE SQL CURSOR (BUT DO NOT DEALLOCATE SY_CMD_TYPE)
+	-- CLOSE & DEALLOCATE SQL CURSOR (BUT DO NOT DEALLOCATE CT_Lib_CMD_TYPE)
 	--
-	function Sy_Close_Cursor(Cmd : Sy_Cmd_Type) return Boolean is
-		function c_sy_close(Conn : Sy_Cmd_Type) return Int_Type;
-		pragma import(C,c_sy_close,"c_sy_close");
+	function CT_Lib_Close_Cursor(Cmd : CT_Lib_Cmd_Type) return Boolean is
+		function c_ct_lib_close(Conn : CT_Lib_Cmd_Type) return Int_Type;
+		pragma import(C,c_ct_lib_close,"c_ct_lib_close");
 	begin
-		return c_sy_close(Cmd) /= 0;
-	end Sy_Close_Cursor;
+		return c_ct_lib_close(Cmd) /= 0;
+	end CT_Lib_Close_Cursor;
 
 
 	--
 	-- SYBASE CT_RESULTS() CALL :
 	--
-	procedure Sy_Results(Cmd : Sy_Cmd_Type; Results : out Result_Type; Columns : out Natural) is
-		function c_sy_results(Cmd : Sy_Cmd_Type; Cols : System.Address) return Result_Type;
-		pragma import(C,c_sy_results,"c_sy_results");
+	procedure CT_Lib_Results(Cmd : CT_Lib_Cmd_Type; Results : out Result_Type; Columns : out Natural) is
+		function c_ct_lib_results(Cmd : CT_Lib_Cmd_Type; Cols : System.Address) return Result_Type;
+		pragma import(C,c_ct_lib_results,"c_ct_lib_results");
 
 		Num_Cols : Int_Type := 0;
 	begin
-		Results := c_sy_results(Cmd,Num_Cols'Address);
+		Results := c_ct_lib_results(Cmd,Num_Cols'Address);
 		Columns := Natural(Num_Cols);
-	end Sy_Results;
+	end CT_Lib_Results;
 
 
 	--
 	-- Special Result check for CS_CMD_DONE
 	--
-	function Sy_Is_Done(Cmd : Sy_Cmd_Type) return Boolean is
-		function c_sy_isdone(Cmd : Sy_Cmd_Type) return Int_Type;
-		pragma import(C,c_sy_isdone,"c_sy_isdone");
+	function CT_Lib_Is_Done(Cmd : CT_Lib_Cmd_Type) return Boolean is
+		function c_ct_lib_isdone(Cmd : CT_Lib_Cmd_Type) return Int_Type;
+		pragma import(C,c_ct_lib_isdone,"c_ct_lib_isdone");
 	begin
-		return c_sy_isdone(Cmd) /= 0;
-	end Sy_Is_Done;
+		return c_ct_lib_isdone(Cmd) /= 0;
+	end CT_Lib_Is_Done;
 
 
 	--
 	-- Special Result check for CS_CMD_DONE & CS_END_RESULTS
 	--
-	function Sy_Is_End(Cmd : Sy_Cmd_Type) return Boolean is
-		function c_sy_isend(Cmd : Sy_Cmd_Type) return Int_Type;
-		pragma import(C,c_sy_isend,"c_sy_isend");
+	function CT_Lib_Is_End(Cmd : CT_Lib_Cmd_Type) return Boolean is
+		function c_ct_lib_isend(Cmd : CT_Lib_Cmd_Type) return Int_Type;
+		pragma import(C,c_ct_lib_isend,"c_ct_lib_isend");
 	begin
-		return c_sy_isend(Cmd) /= 0;
-	end Sy_Is_End;
+		return c_ct_lib_isend(Cmd) /= 0;
+	end CT_Lib_Is_End;
 
 
 	--
 	-- Print a debug trace of Sybase results to stderr
 	--
-	procedure Sy_Debug_Results(Cmd : Sy_Cmd_Type) is
-		procedure c_sy_dbg_results(Cmd : Sy_Cmd_Type);
-		pragma import(C,c_sy_dbg_results,"c_sy_dbg_results");
+	procedure CT_Lib_Debug_Results(Cmd : CT_Lib_Cmd_Type) is
+		procedure c_ct_lib_dbg_results(Cmd : CT_Lib_Cmd_Type);
+		pragma import(C,c_ct_lib_dbg_results,"c_ct_lib_dbg_results");
 	begin
-		c_sy_dbg_results(Cmd);
-	end Sy_Debug_Results;
+		c_ct_lib_dbg_results(Cmd);
+	end CT_Lib_Debug_Results;
 
 
 	--
 	-- Cancel pending results
 	--
-	function Sy_Cancel(Cmd : Sy_Cmd_Type) return Sy_Cancel_Type is
-		function c_sy_cancel(Cmd : Sy_Cmd_Type) return Int_Type;
-		pragma import(C,c_sy_cancel,"c_sy_cancel");
+	function CT_Lib_Cancel(Cmd : CT_Lib_Cmd_Type) return CT_Lib_Cancel_Type is
+		function c_ct_lib_cancel(Cmd : CT_Lib_Cmd_Type) return Int_Type;
+		pragma import(C,c_ct_lib_cancel,"c_ct_lib_cancel");
 
 		R : Int_Type;
 	begin
-		R := c_sy_cancel(Cmd);
+		R := c_ct_lib_cancel(Cmd);
 		case R is
 			when 0 =>
 				return Cancel_Failed;
@@ -317,16 +317,16 @@ package body APQ.Sybase is
 			when others =>
 				raise Program_Error;
 		end case;
-	end Sy_Cancel;
+	end CT_Lib_Cancel;
 
 
 
 	--
 	-- DESCRIBE THE COLUMNS FROM A RESULT :
 	--
-	function Sy_Describe(Cmd : Sy_Cmd_Type; Columns : Positive) return Sy_Columns_Ptr is
-		procedure c_sy_describe(
-			Cmd :		in	Sy_Cmd_Type;
+	function CT_Lib_Describe(Cmd : CT_Lib_Cmd_Type; Columns : Positive) return CT_Lib_Columns_Ptr is
+		procedure c_ct_lib_describe(
+			Cmd :		in	CT_Lib_Cmd_Type;
 			Item :		in	Int_Type;
 			Name :		in	System.Address;
 			Name_Size :	in	System.Address;
@@ -336,14 +336,14 @@ package body APQ.Sybase is
 			Scale :		in	System.Address;
 			Precision :	in	System.Address
 		);
-		pragma import(C,c_sy_describe,"c_sy_describe");
+		pragma import(C,c_ct_lib_describe,"c_ct_lib_describe");
 
-		D : Sy_Columns_Ptr := new Sy_Columns_Array(1..Column_Index_Type(Columns));
+		D : CT_Lib_Columns_Ptr := new CT_Lib_Columns_Array(1..Column_Index_Type(Columns));
 	begin
 
 		for X in D'Range loop
 			D(X).Name_Length := D(X).Name'Length;
-			c_sy_describe(
+			c_ct_lib_describe(
 				Cmd		=> Cmd,
 				Item		=> Int_Type(X),
 				Name		=> D(X).Name(1)'Address,
@@ -358,26 +358,26 @@ package body APQ.Sybase is
 		end loop;
 		return D;
 
-	end Sy_Describe;
+	end CT_Lib_Describe;
 
 
 	--
 	-- SYBASE CT_GET_DATA() :
 	--
-	procedure Sy_Get_Data(Cmd : Sy_Cmd_Type; Item : Column_Index_Type; Buf : System.Address; Len : Natural; Out_Len : out Natural; RC : out Get_Data_Type) is
-		function c_sy_get_data(Cmd : Sy_Cmd_Type; Item : Int_Type; Buf : System.Address; Len : Int_Type; Out_Len : System.Address) return Get_Data_Type;
-		pragma import(C,c_sy_get_data,"c_sy_get_data");
+	procedure CT_Lib_Get_Data(Cmd : CT_Lib_Cmd_Type; Item : Column_Index_Type; Buf : System.Address; Len : Natural; Out_Len : out Natural; RC : out Get_Data_Type) is
+		function c_ct_lib_get_data(Cmd : CT_Lib_Cmd_Type; Item : Int_Type; Buf : System.Address; Len : Int_Type; Out_Len : System.Address) return Get_Data_Type;
+		pragma import(C,c_ct_lib_get_data,"c_ct_lib_get_data");
 		Rtn : Int_Type;
 	begin
-		RC := c_sy_get_data(Cmd,Int_Type(Item),Buf,Int_Type(Len),Rtn'Address);
+		RC := c_ct_lib_get_data(Cmd,Int_Type(Item),Buf,Int_Type(Len),Rtn'Address);
 		Out_Len := Natural(Rtn);
-	end Sy_Get_Data;
+	end CT_Lib_Get_Data;
 
 
 	--
 	-- GET CHAR_TYPE DATA :
 	--
-	function Sy_Get_Char_Data(Cmd : Sy_Cmd_Type; Item : Column_Index_Type; Max_Length : Natural ) return String_Ptr is
+	function CT_Lib_Get_Char_Data(Cmd : CT_Lib_Cmd_Type; Item : Column_Index_Type; Max_Length : Natural ) return String_Ptr is
 		use Ada.Strings.Unbounded;
 
 		Ret_Code :	Get_Data_Type;
@@ -387,7 +387,7 @@ package body APQ.Sybase is
 	begin
 
 		loop
-			Sy_Get_Data(Cmd,Item,Char_Buf(1)'Address,Char_Buf'Length,Char_Len,Ret_Code);
+			CT_Lib_Get_Data(Cmd,Item,Char_Buf(1)'Address,Char_Buf'Length,Char_Len,Ret_Code);
 			exit when Ret_Code = Get_Data_Failed;
 			if Char_Len > 0 then
 				Append(Char_Val,Char_Buf(1..Char_Len));
@@ -397,7 +397,7 @@ package body APQ.Sybase is
 
 		if Ret_Code /= Last_Chunk then
 			Raise_Exception(Failed'Identity,
-				"SY50: Unable to fetch all character data (Sy_Get_Char_Data).");
+				"SY50: Unable to fetch all character data (CT_Lib_Get_Char_Data).");
 		end if;
 
 		if Length(Char_Val) < 1 then
@@ -406,21 +406,21 @@ package body APQ.Sybase is
 			return new String'(To_String(Char_Val));
 		end if;
 
-	end Sy_Get_Char_Data;
+	end CT_Lib_Get_Char_Data;
 
 
 	--
 	-- GET 2 BYTE INTEGER VALUE
 	--
-	procedure Sy_Get_U2(Cmd : Sy_Cmd_Type; Item : Column_Index_Type; V : out U2_Type; Is_Null : out Boolean) is
+	procedure CT_Lib_Get_U2(Cmd : CT_Lib_Cmd_Type; Item : Column_Index_Type; V : out U2_Type; Is_Null : out Boolean) is
 		RC :	Get_Data_Type;
 		Len :	Natural;
 		U2 :	U2_Type;
 	begin
-		Sy_Get_Data(Cmd,Item,U2'Address,2,Len,RC);
+		CT_Lib_Get_Data(Cmd,Item,U2'Address,2,Len,RC);
 		if RC /= Last_Chunk then
 			Raise_Exception(Failed'Identity,
-				"SY51: Unable to get all data (Sy_Get_U2).");
+				"SY51: Unable to get all data (CT_Lib_Get_U2).");
 		end if;
 		Is_Null := Len = 0;
 		if not Is_Null then
@@ -429,21 +429,21 @@ package body APQ.Sybase is
 		else
 			V := 0;
 		end if;
-	end Sy_Get_U2;
+	end CT_Lib_Get_U2;
 
 
 	--
 	-- GET 1 BYTE INTEGER VALUE
 	--
-	procedure Sy_Get_I1(Cmd : Sy_Cmd_Type; Item : Column_Index_Type; V : out I1_Type; Is_Null : out Boolean) is
+	procedure CT_Lib_Get_I1(Cmd : CT_Lib_Cmd_Type; Item : Column_Index_Type; V : out I1_Type; Is_Null : out Boolean) is
 		RC :	Get_Data_Type;
 		Len :	Natural;
 		I1 :	I1_Type;
 	begin
-		Sy_Get_Data(Cmd,Item,I1'Address,1,Len,RC);
+		CT_Lib_Get_Data(Cmd,Item,I1'Address,1,Len,RC);
 		if RC /= Last_Chunk then
 			Raise_Exception(Failed'Identity,
-				"SY52: Unable to get all data (Sy_Get_I1).");
+				"SY52: Unable to get all data (CT_Lib_Get_I1).");
 		end if;
 		Is_Null := Len = 0;
 		if not Is_Null then
@@ -452,21 +452,21 @@ package body APQ.Sybase is
 		else
 			V := 0;
 		end if;
-	end Sy_Get_I1;
+	end CT_Lib_Get_I1;
 
 
 	--
 	-- GET 2 BYTE INTEGER VALUE
 	--
-	procedure Sy_Get_I2(Cmd : Sy_Cmd_Type; Item : Column_Index_Type; V : out I2_Type; Is_Null : out Boolean) is
+	procedure CT_Lib_Get_I2(Cmd : CT_Lib_Cmd_Type; Item : Column_Index_Type; V : out I2_Type; Is_Null : out Boolean) is
 		RC :	Get_Data_Type;
 		Len :	Natural;
 		I2 :	I2_Type;
 	begin
-		Sy_Get_Data(Cmd,Item,I2'Address,2,Len,RC);
+		CT_Lib_Get_Data(Cmd,Item,I2'Address,2,Len,RC);
 		if RC /= Last_Chunk then
 			Raise_Exception(Failed'Identity,
-				"SY53: Unable to get all data (Sy_Get_I2).");
+				"SY53: Unable to get all data (CT_Lib_Get_I2).");
 		end if;
 		Is_Null := Len = 0;
 		if not Is_Null then
@@ -475,21 +475,21 @@ package body APQ.Sybase is
 		else
 			V := 0;
 		end if;
-	end Sy_Get_I2;
+	end CT_Lib_Get_I2;
 
 
 	--
 	-- GET 4 BYTE INTEGER VALUE
 	--
-	procedure Sy_Get_I4(Cmd : Sy_Cmd_Type; Item : Column_Index_Type; V : out I4_Type; Is_Null : out Boolean) is
+	procedure CT_Lib_Get_I4(Cmd : CT_Lib_Cmd_Type; Item : Column_Index_Type; V : out I4_Type; Is_Null : out Boolean) is
 		RC :	Get_Data_Type;
 		Len :	Natural;
 		I4 :	I4_Type;
 	begin
-		Sy_Get_Data(Cmd,Item,I4'Address,4,Len,RC);
+		CT_Lib_Get_Data(Cmd,Item,I4'Address,4,Len,RC);
 		if RC /= Last_Chunk then
 			Raise_Exception(Failed'Identity,
-				"SY54: Unable to get all data (Sy_Get_I4).");
+				"SY54: Unable to get all data (CT_Lib_Get_I4).");
 		end if;
 		Is_Null := Len = 0;
 		if not Is_Null then
@@ -498,21 +498,21 @@ package body APQ.Sybase is
 		else
 			V := 0;
 		end if;
-	end Sy_Get_I4;
+	end CT_Lib_Get_I4;
 
 
 	--
 	-- GET 8 BYTE INTEGER VALUE
 	--
-	procedure Sy_Get_I8(Cmd : Sy_Cmd_Type; Item : Column_Index_Type; V : out I8_Type; Is_Null : out Boolean) is
+	procedure CT_Lib_Get_I8(Cmd : CT_Lib_Cmd_Type; Item : Column_Index_Type; V : out I8_Type; Is_Null : out Boolean) is
 		RC :	Get_Data_Type;
 		Len :	Natural;
 		I8 :	I8_Type;
 	begin
-		Sy_Get_Data(Cmd,Item,I8'Address,8,Len,RC);
+		CT_Lib_Get_Data(Cmd,Item,I8'Address,8,Len,RC);
 		if RC /= Last_Chunk then
 			Raise_Exception(Failed'Identity,
-				"SY55: Unable to get all data (Sy_Get_I8).");
+				"SY55: Unable to get all data (CT_Lib_Get_I8).");
 		end if;
 		Is_Null := Len = 0;
 		if not Is_Null then
@@ -521,21 +521,21 @@ package body APQ.Sybase is
 		else
 			V := 0;
 		end if;
-	end Sy_Get_I8;
+	end CT_Lib_Get_I8;
 
 
 	--
 	-- GET 4 BYTE REAL VALUE
 	--
-	procedure Sy_Get_R4(Cmd : Sy_Cmd_Type; Item : Column_Index_Type; V : out R4_Type; Is_Null : out Boolean) is
+	procedure CT_Lib_Get_R4(Cmd : CT_Lib_Cmd_Type; Item : Column_Index_Type; V : out R4_Type; Is_Null : out Boolean) is
 		RC :	Get_Data_Type;
 		Len :	Natural;
 		R4 :	R4_Type;
 	begin
-		Sy_Get_Data(Cmd,Item,R4'Address,4,Len,RC);
+		CT_Lib_Get_Data(Cmd,Item,R4'Address,4,Len,RC);
 		if RC /= Last_Chunk then
 			Raise_Exception(Failed'Identity,
-				"SY56: Unable to get all data (Sy_Get_R4).");
+				"SY56: Unable to get all data (CT_Lib_Get_R4).");
 		end if;
 		Is_Null := Len = 0;
 		if not Is_Null then
@@ -544,21 +544,21 @@ package body APQ.Sybase is
 		else
 			V := 0.0;
 		end if;
-	end Sy_Get_R4;
+	end CT_Lib_Get_R4;
 
 
 	--
 	-- GET 8 BYTE REAL VALUE
 	--
-	procedure Sy_Get_R8(Cmd : Sy_Cmd_Type; Item : Column_Index_Type; V : out R8_Type; Is_Null : out Boolean) is
+	procedure CT_Lib_Get_R8(Cmd : CT_Lib_Cmd_Type; Item : Column_Index_Type; V : out R8_Type; Is_Null : out Boolean) is
 		RC :	Get_Data_Type;
 		Len :	Natural;
 		R8 :	R8_Type;
 	begin
-		Sy_Get_Data(Cmd,Item,R8'Address,8,Len,RC);
+		CT_Lib_Get_Data(Cmd,Item,R8'Address,8,Len,RC);
 		if RC /= Last_Chunk then
 			Raise_Exception(Failed'Identity,
-				"SY57: Unable to get all data (Sy_Get_R8).");
+				"SY57: Unable to get all data (CT_Lib_Get_R8).");
 		end if;
 		Is_Null := Len = 0;
 		if not Is_Null then
@@ -567,20 +567,20 @@ package body APQ.Sybase is
 		else
 			V := 0.0;
 		end if;
-	end Sy_Get_R8;
+	end CT_Lib_Get_R8;
 
 
 	--
 	-- GET DATA FOR COLUMN AND CONVERT IT TO STRING TYPE
 	--
-	function Sy_Convert(
-		Cmd :		in	Sy_Cmd_Type;
+	function CT_Lib_Convert(
+		Cmd :		in	CT_Lib_Cmd_Type;
 		Item :		in	Column_Index_Type;
 		Src_Fmt :	in	Field_Type
 	) return String_Ptr is
-		function Sy_To_String(Cmd : Sy_Cmd_Type; Item : Int_Type; Fmt : Field_Type; Buf, Len : System.Address)
+		function CT_Lib_To_String(Cmd : CT_Lib_Cmd_Type; Item : Int_Type; Fmt : Field_Type; Buf, Len : System.Address)
 			return Int_Type;
-		pragma import(C,Sy_To_String,"c_sy_to_string");
+		pragma import(C,CT_Lib_To_String,"c_ct_lib_to_string");
 
 		Buf : String(1..512);
 		Len : Natural := Buf'Length;
@@ -589,7 +589,7 @@ package body APQ.Sybase is
 		case Src_Fmt is
 			when Type_DATETIME | Type_DATETIME4 | Type_MONEY | Type_MONEY4 | Type_NUMERIC | Type_DECIMAL =>
 
-				if Sy_To_String(Cmd,Int_Type(Item),Src_Fmt,Buf(1)'Address,Len'Address) /= 0 then
+				if CT_Lib_To_String(Cmd,Int_Type(Item),Src_Fmt,Buf(1)'Address,Len'Address) /= 0 then
 					pragma assert(Len <= Buf'Length);
 					if Len > 0 then
 						return new String'(Buf(1..Len));
@@ -602,7 +602,7 @@ package body APQ.Sybase is
 
 			when Type_BIT =>
 
-				if Sy_To_String(Cmd,Int_Type(Item),Src_Fmt,Buf(1)'Address,Len'Address) /= 0 then
+				if CT_Lib_To_String(Cmd,Int_Type(Item),Src_Fmt,Buf(1)'Address,Len'Address) /= 0 then
 					pragma assert(Len <= Buf'Length);
 					if Len > 0 then
 						declare
@@ -627,13 +627,13 @@ package body APQ.Sybase is
 				raise Program_Error;
 		end case;
 
-	end Sy_Convert;
+	end CT_Lib_Convert;
 
 
 	--
 	-- Return String Data for column data
 	--
-	function Sy_Get_Data(Cmd : Sy_Cmd_Type; Item : Column_Index_Type; Described : Sy_Column_Type) return String_Ptr is
+	function CT_Lib_Get_Data(Cmd : CT_Lib_Cmd_Type; Item : Column_Index_Type; Described : CT_Lib_Column_Type) return String_Ptr is
 		function Trim(S : String) return String_Ptr is
 		begin
 			if S(S'First) = ' ' then
@@ -649,13 +649,13 @@ package body APQ.Sybase is
 		case Described.Data_Type is
 
 			when Type_CHAR | Type_LONGCHAR | Type_TEXT | Type_VARCHAR =>
-				return Sy_Get_Char_Data(Cmd,Item,Described.Max_Length);
+				return CT_Lib_Get_Char_Data(Cmd,Item,Described.Max_Length);
 
 			when Type_USHORT =>
 				declare
 					V : U2_Type;
 				begin
-					Sy_Get_U2(Cmd,Item,V,Is_Null);
+					CT_Lib_Get_U2(Cmd,Item,V,Is_Null);
 					if Is_Null then
 						return null;
 					else
@@ -667,7 +667,7 @@ package body APQ.Sybase is
 				declare
 					V : I1_Type;
 				begin
-					Sy_Get_I1(Cmd,Item,V,Is_Null);
+					CT_Lib_Get_I1(Cmd,Item,V,Is_Null);
 					if Is_Null then
 						return null;
 					else
@@ -679,7 +679,7 @@ package body APQ.Sybase is
 				declare
 					V : I2_Type;
 				begin
-					Sy_Get_I2(Cmd,Item,V,Is_Null);
+					CT_Lib_Get_I2(Cmd,Item,V,Is_Null);
 					if Is_Null then
 						return null;
 					else
@@ -691,7 +691,7 @@ package body APQ.Sybase is
 				declare
 					V : I4_Type;
 				begin
-					Sy_Get_I4(Cmd,Item,V,Is_Null);
+					CT_Lib_Get_I4(Cmd,Item,V,Is_Null);
 					if Is_Null then
 						return null;
 					else
@@ -703,7 +703,7 @@ package body APQ.Sybase is
 				declare
 					V : I8_Type;
 				begin
-					Sy_Get_I8(Cmd,Item,V,Is_Null);
+					CT_Lib_Get_I8(Cmd,Item,V,Is_Null);
 					if Is_Null then
 						return null;
 					else
@@ -715,7 +715,7 @@ package body APQ.Sybase is
 				declare
 					V : R8_Type;
 				begin
-					Sy_Get_R8(Cmd,Item,V,Is_Null);
+					CT_Lib_Get_R8(Cmd,Item,V,Is_Null);
 					if Is_Null then
 						return null;
 					else
@@ -727,7 +727,7 @@ package body APQ.Sybase is
 				declare
 					V : R4_Type;
 				begin
-					Sy_Get_R4(Cmd,Item,V,Is_Null);
+					CT_Lib_Get_R4(Cmd,Item,V,Is_Null);
 					if Is_Null then
 						return null;
 					else
@@ -739,134 +739,134 @@ package body APQ.Sybase is
 				return null;		-- ???
 
 			when Type_BIT =>
-				return Sy_Convert(Cmd,Item,Described.Data_Type);
+				return CT_Lib_Convert(Cmd,Item,Described.Data_Type);
 
 			when Type_DATETIME | Type_DATETIME4  =>
-				return Sy_Convert(Cmd,Item,Described.Data_Type);
+				return CT_Lib_Convert(Cmd,Item,Described.Data_Type);
 
 			when Type_MONEY | Type_MONEY4 | Type_NUMERIC | Type_DECIMAL =>
-				return Sy_Convert(Cmd,Item,Described.Data_Type);
+				return CT_Lib_Convert(Cmd,Item,Described.Data_Type);
 
 			when Type_VARBINARY =>
 				Raise_Exception(Not_Supported'Identity,
-					"SY58: APQ does not support Type_VARBINARY (Sy_Get_Data).");
+					"SY58: APQ does not support Type_VARBINARY (CT_Lib_Get_Data).");
 				return null;
 			when Type_BINARY =>
 				Raise_Exception(Not_Supported'Identity,
-					"SY59: APQ does not support Type_BINARY (Sy_Get_Data).");
+					"SY59: APQ does not support Type_BINARY (CT_Lib_Get_Data).");
 				return null;
 			when Type_LONGBINARY =>
 				Raise_Exception(Not_Supported'Identity,
-					"SY60: APQ does not support Type_LONGBINARY (Sy_Get_Data).");
+					"SY60: APQ does not support Type_LONGBINARY (CT_Lib_Get_Data).");
 				return null;
 			when Type_IMAGE =>
 				Raise_Exception(Not_Supported'Identity,
-					"SY61: APQ does not support Type_IMAGE (Sy_Get_Data).");
+					"SY61: APQ does not support Type_IMAGE (CT_Lib_Get_Data).");
 				return null;
 			when Type_SENSITIVITY =>
 				Raise_Exception(Not_Supported'Identity,
-					"SY62: APQ does not support Type_SENSITIVITY (Sy_Get_Data).");
+					"SY62: APQ does not support Type_SENSITIVITY (CT_Lib_Get_Data).");
 				return null;
 			when Type_BOUNDARY =>
 				Raise_Exception(Not_Supported'Identity,
-					"SY63: APQ does not support Type_BOUNDARY (Sy_Get_Data).");
+					"SY63: APQ does not support Type_BOUNDARY (CT_Lib_Get_Data).");
 				return null;
 			when Type_UNICHAR =>
 				Raise_Exception(Not_Supported'Identity,
-					"SY64: APQ does not support Type_UNICHAR (Sy_Get_Data).");
+					"SY64: APQ does not support Type_UNICHAR (CT_Lib_Get_Data).");
 				return null;
 		end case;
 
-	end Sy_Get_Data;
+	end CT_Lib_Get_Data;
 
 
 	--
 	-- GET DATA FOR EACH COLUMN
 	--
-	procedure Sy_Get_Data(Cmd : Sy_Cmd_Type; Values : in out Sy_Columns_Array) is
+	procedure CT_Lib_Get_Data(Cmd : CT_Lib_Cmd_Type; Values : in out CT_Lib_Columns_Array) is
 	begin
 
 		for X in Values'Range loop
-			Values(X).Str_Value := Sy_Get_Data(Cmd,X,Values(X));
+			Values(X).Str_Value := CT_Lib_Get_Data(Cmd,X,Values(X));
 		end loop;
 
-	end Sy_Get_Data;
+	end CT_Lib_Get_Data;
 
 
 
-	procedure Sy_Bool_Option(Conn : Sy_Conn_Type; E : Sybase_Enum_Option; Arg : Interfaces.C.int) is
+	procedure CT_Lib_Bool_Option(Conn : CT_Lib_Conn_Type; E : CT_Lib_Enum_Option; Arg : Interfaces.C.int) is
 		use Interfaces.C;
 
-		function c_sy_bool_option(Conn : Sy_Conn_Type; E : Sybase_Enum_Option; Arg : Interfaces.C.int) return Interfaces.C.int;
-		pragma import(C,c_sy_bool_option,"c_sy_bool_option");
+		function c_ct_lib_bool_option(Conn : CT_Lib_Conn_Type; E : CT_Lib_Enum_Option; Arg : Interfaces.C.int) return Interfaces.C.int;
+		pragma import(C,c_ct_lib_bool_option,"c_ct_lib_bool_option");
 	begin
-		if c_sy_bool_option(Conn,E,Arg) = 0 then
+		if c_ct_lib_bool_option(Conn,E,Arg) = 0 then
 			Raise_Exception(Failed'Identity,
-				"SY66: Failed to set a Sybase boolean option (Sy_Bool_Option).");
+				"SY66: Failed to set a Sybase boolean option (CT_Lib_Bool_Option).");
 		end if;
-	end Sy_Bool_Option;
+	end CT_Lib_Bool_Option;
 
 
 
-	procedure Sy_Uint_Option(Conn : Sy_Conn_Type; E : Sybase_Enum_Option; Arg : Interfaces.C.unsigned) is
+	procedure CT_Lib_Uint_Option(Conn : CT_Lib_Conn_Type; E : CT_Lib_Enum_Option; Arg : Interfaces.C.unsigned) is
 		use Interfaces.C;
 
-		function c_sy_uint_option(Conn : Sy_Conn_Type; E : Sybase_Enum_Option; Arg : Interfaces.C.unsigned) return Interfaces.C.int;
-		pragma import(C,c_sy_uint_option,"c_sy_uint_option");
+		function c_ct_lib_uint_option(Conn : CT_Lib_Conn_Type; E : CT_Lib_Enum_Option; Arg : Interfaces.C.unsigned) return Interfaces.C.int;
+		pragma import(C,c_ct_lib_uint_option,"c_ct_lib_uint_option");
 	begin
-		if c_sy_uint_option(Conn,E,Arg) = 0 then
+		if c_ct_lib_uint_option(Conn,E,Arg) = 0 then
 			Raise_Exception(Failed'Identity,
-				"SY67: Failed to set a Sybase unsigned option (Sy_Uint_Option).");
+				"SY67: Failed to set a Sybase unsigned option (CT_Lib_Uint_Option).");
 		end if;
-	end Sy_Uint_Option;
+	end CT_Lib_Uint_Option;
 
 
 
-	procedure Sy_DOW_Option(Conn : Sy_Conn_Type; E : Sybase_Enum_Option; Arg : Interfaces.C.int) is
+	procedure CT_Lib_DOW_Option(Conn : CT_Lib_Conn_Type; E : CT_Lib_Enum_Option; Arg : Interfaces.C.int) is
 		use Interfaces.C;
 
-		function c_sy_dow_option(Conn : Sy_Conn_Type; E : Sybase_Enum_Option; Arg : Interfaces.C.int) return Interfaces.C.int;
-		pragma import(C,c_sy_dow_option,"c_sy_dow_option");
+		function c_ct_lib_dow_option(Conn : CT_Lib_Conn_Type; E : CT_Lib_Enum_Option; Arg : Interfaces.C.int) return Interfaces.C.int;
+		pragma import(C,c_ct_lib_dow_option,"c_ct_lib_dow_option");
 	begin
-		if c_sy_dow_option(Conn,E,Arg) = 0 then
+		if c_ct_lib_dow_option(Conn,E,Arg) = 0 then
 			Raise_Exception(Failed'Identity,
-				"SY68: Failed to set a Sybase day-of-week option (Sy_DOW_Option).");
+				"SY68: Failed to set a Sybase day-of-week option (CT_Lib_DOW_Option).");
 		end if;
-	end Sy_DOW_Option;
+	end CT_Lib_DOW_Option;
 
 
 
-	procedure Sy_Format_Option(Conn : Sy_Conn_Type; E : Sybase_Enum_Option; Arg : Interfaces.C.int) is
+	procedure CT_Lib_Format_Option(Conn : CT_Lib_Conn_Type; E : CT_Lib_Enum_Option; Arg : Interfaces.C.int) is
 		use Interfaces.C;
 
-		function c_sy_format_option(Conn : Sy_Conn_Type; E : Sybase_Enum_Option; Arg : Interfaces.C.int) return Interfaces.C.int;
-		pragma import(C,c_sy_format_option,"c_sy_format_option");
+		function c_ct_lib_format_option(Conn : CT_Lib_Conn_Type; E : CT_Lib_Enum_Option; Arg : Interfaces.C.int) return Interfaces.C.int;
+		pragma import(C,c_ct_lib_format_option,"c_ct_lib_format_option");
 	begin
-		if c_sy_format_option(Conn,E,Arg) = 0 then
+		if c_ct_lib_format_option(Conn,E,Arg) = 0 then
 			Raise_Exception(Failed'Identity,
-				"SY69: Failed to set a date format option (Sy_Format_Option).");
+				"SY69: Failed to set a date format option (CT_Lib_Format_Option).");
 		end if;
-	end Sy_Format_Option;
+	end CT_Lib_Format_Option;
 
 
 
-	procedure Sy_String_Option(Conn : Sy_Conn_Type; E : Sybase_Enum_Option; Arg : System.Address) is
+	procedure CT_Lib_String_Option(Conn : CT_Lib_Conn_Type; E : CT_Lib_Enum_Option; Arg : System.Address) is
 		use Interfaces.C;
 
-		function c_sy_string_option(Conn : Sy_Conn_Type; E : Sybase_Enum_Option; Arg : System.Address) return Interfaces.C.int;
-		pragma import(C,c_sy_string_option,"c_sy_string_option");
+		function c_ct_lib_string_option(Conn : CT_Lib_Conn_Type; E : CT_Lib_Enum_Option; Arg : System.Address) return Interfaces.C.int;
+		pragma import(C,c_ct_lib_string_option,"c_ct_lib_string_option");
 	begin
-		if c_sy_string_option(Conn,E,Arg) = 0 then
+		if c_ct_lib_string_option(Conn,E,Arg) = 0 then
 			Raise_Exception(Failed'Identity,
-				"SY70: Failed to set a Sybase string option (Sy_String_Option).");
+				"SY70: Failed to set a Sybase string option (CT_Lib_String_Option).");
 		end if;
-	end Sy_String_Option;
+	end CT_Lib_String_Option;
 
 	--
 	-- FREE COLUMN DATA
 	--
-	procedure Free(Values : in out Sy_Columns_Ptr; Release_Array : Boolean := True) is
-		procedure Free_Array is new Ada.Unchecked_Deallocation(Sy_Columns_Array,Sy_Columns_Ptr);
+	procedure Free(Values : in out CT_Lib_Columns_Ptr; Release_Array : Boolean := True) is
+		procedure Free_Array is new Ada.Unchecked_Deallocation(CT_Lib_Columns_Array,CT_Lib_Columns_Ptr);
 	begin
 
 		for X in Values.all'Range loop
@@ -881,4 +881,4 @@ package body APQ.Sybase is
 	end Free;
 
 
-end APQ.Sybase;
+end APQ.CT_Lib;

@@ -1,7 +1,7 @@
 /****************************************************************************/
 /*                          APQ DATABASE BINDINGS                           */
 /*                                                                          */
-/*                              A P Q - SYBASE 				    */
+/*                              A P Q - CT_LIB 				    */
 /*                                                                          */
 /*                                                                          */
 /*         Copyright (C) 2002-2007, Warren W. Gay VE3WWG                    */
