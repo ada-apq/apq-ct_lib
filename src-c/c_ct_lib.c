@@ -47,7 +47,7 @@
 
 /*
  * These values must match type Sy_Row_Info_Type in APQ.Sybase, and
- * be used by the c_sy_results() function below :
+ * be used by the c_ct_lib_results() function below :
  */
 #define SY_ROW_INFO_Execution_Failed   0  /* ct_results() call failed */
 #define SY_ROW_INFO_No_Results         1  /* Command processed, but no results available */
@@ -59,14 +59,14 @@
 #define SY_ROW_INFO_Status_Results     7  /* Status results available */
 
 /*
- * c_sy_get_data return values :
+ * c_ct_lib_get_data return values :
  */
 #define SY_GDATA_Get_Data_Failed	0
 #define SY_GDATA_Not_Last_Chunk		1
 #define SY_GDATA_Last_Chunk		2
 
 /*
- * c_sy_fetch return values :
+ * c_ct_lib_fetch return values :
  */
 #define SY_Fetch_Row			20
 #define SY_Fetch_End			21
@@ -166,7 +166,7 @@ DllMain(HANDLE inst,DWORD reason_called,LPVOID reserved) {
  * Return the user data pointer (System.Address of APQ.Sybase.Client.Connection_Type) :
  */
 EXPORT void *
-c_sy_get_userdata(CS_CONNECTION *conn) {
+c_ct_lib_get_userdata(CS_CONNECTION *conn) {
 	CS_RETCODE ret;
 	void *userdata = 0;
 
@@ -184,7 +184,7 @@ c_sy_get_userdata(CS_CONNECTION *conn) {
  * Register a (Ada) Client Message Callback :
  */ 
 EXPORT void
-c_sy_reg_clientmsgcb(apq_clientmsg_cb proc) {
+c_ct_lib_reg_clientmsgcb(apq_clientmsg_cb proc) {
 	apq_clientmsg_proc = proc;
 }
 
@@ -192,7 +192,7 @@ c_sy_reg_clientmsgcb(apq_clientmsg_cb proc) {
  * Register a (Ada) Server Message Callback :
  */ 
 EXPORT void
-c_sy_reg_servermsgcb(apq_servermsg_cb proc) {
+c_ct_lib_reg_servermsgcb(apq_servermsg_cb proc) {
 	apq_servermsg_proc = proc;
 }
 
@@ -212,7 +212,7 @@ clientmsg_cb(CS_CONTEXT *ctx,CS_CONNECTION *conn,CS_CLIENTMSG *msg) {
 
 	if ( apq_clientmsg_proc != 0 ) {
 		apq_clientmsg_proc(
-			c_sy_get_userdata(conn),	/* Connection_Type */
+			c_ct_lib_get_userdata(conn),	/* Connection_Type */
 			msg_layer,			/* Message_Layer */
 			msg_origin,			/* Message_Origin */
 			msg_severity,			/* Message_Severity */
@@ -244,7 +244,7 @@ servermsg_cb(CS_CONTEXT *ctx,CS_CONNECTION *conn,CS_SERVERMSG *msg) {
 
 	if ( apq_servermsg_proc != 0 ) {
 		apq_servermsg_proc(
-			c_sy_get_userdata(conn),	/* Connection_Type */
+			c_ct_lib_get_userdata(conn),	/* Connection_Type */
 			svr_severity,			/* Message Severity */
 			svr_msgnumber,			/* Message Number */
 			svr_state,			/* Server State */
@@ -261,7 +261,7 @@ servermsg_cb(CS_CONTEXT *ctx,CS_CONNECTION *conn,CS_SERVERMSG *msg) {
 }
 
 EXPORT void
-c_sy_pad(char *buffer,int curlen,int size) {
+c_ct_lib_pad(char *buffer,int curlen,int size) {
 	int x = curlen;
 	
 	for ( ; x < size; ++x )
@@ -272,7 +272,7 @@ c_sy_pad(char *buffer,int curlen,int size) {
  * Convert to Sybase bits to APQ bits :
  */
 static int
-c_sy_to_column_status(int cs_value) {
+c_ct_lib_to_column_status(int cs_value) {
 	static struct CS_TAB {
 		CS_INT	syb_bit;
 		int	apq_bit;
@@ -301,7 +301,7 @@ c_sy_to_column_status(int cs_value) {
  * Describe a column :
  */
 EXPORT int
-c_sy_describe(
+c_ct_lib_describe(
 	CS_COMMAND *cmd,		/* Input : Command structure */
 	int item,			/* Input : Column index, starting from 1 */
 	char *name,			/* Output : Name buffer */
@@ -330,7 +330,7 @@ c_sy_describe(
 		abort();
 
 	strncpy(name,fmt.name,fmt.namelen);
-	c_sy_pad(name,fmt.namelen,*name_size);
+	c_ct_lib_pad(name,fmt.namelen,*name_size);
 	*name_size = fmt.namelen;
 
 	/*
@@ -341,7 +341,7 @@ c_sy_describe(
 	/*
 	 * Column status bits :
 	 */
-	*status = c_sy_to_column_status(fmt.status);
+	*status = c_ct_lib_to_column_status(fmt.status);
 	
 	/*
 	 * Maximum possible data length :
@@ -382,7 +382,7 @@ c_sy_describe(
  * 	sqlwarn[5]	when 'W', then a server conversion or truncation error occurred
  */
 EXPORT int
-c_sy_get_error(
+c_ct_lib_get_error(
 	CS_CONNECTION *conn,		/* Input:	Connection */
 	long *sqlcode,			/* Output:	SQLCODE */
 	char *errmp,			/* Output:	Error message buffer */
@@ -431,7 +431,7 @@ c_sy_get_error(
 //		strncpy(errmp,lcl_sqlca.sqlerrm.sqlerrmc,msgbuf_size-1)[msgbuf_size-1] = 0;
 //		*errmp_size = strlen(lcl_sqlca.sqlerrm.sqlerrmc);		/* Return message size */
 //		strncpy(sqlerrp,lcl_sqlca.sqlerrp,sqlerrp_size);
-//		c_sy_pad(sqlerrp,strlen(lcl_sqlca.sqlerrp),sqlerrp_size);	/* Right pad to length */
+//		c_ct_lib_pad(sqlerrp,strlen(lcl_sqlca.sqlerrp),sqlerrp_size);	/* Right pad to length */
 //		*rows_affected = lcl_sqlca.sqlerrd[2];				/* # rows affected */
 //		memcpy(sqlwarn,lcl_sqlca.sqlwarn,6);				/* 6 Warning flags */
 //
@@ -449,7 +449,7 @@ c_sy_get_error(
  * Return the CS_CONTEXT used by the given CS_CONNECTION :
  */
 EXPORT CS_CONTEXT *
-c_sy_context_of(CS_CONNECTION *conn) {
+c_ct_lib_context_of(CS_CONNECTION *conn) {
 	CS_CONTEXT *ctx = NULL;
 	CS_RETCODE ret;
 
@@ -463,7 +463,7 @@ c_sy_context_of(CS_CONNECTION *conn) {
  * Return the CS_CONNECTION used by the given CS_COMMAND :
  */
 EXPORT CS_CONNECTION *
-c_sy_connection_of(CS_COMMAND *cmd) {
+c_ct_lib_connection_of(CS_COMMAND *cmd) {
 	CS_CONNECTION *conn = NULL;
 	CS_RETCODE ret;
 
@@ -477,7 +477,7 @@ c_sy_connection_of(CS_COMMAND *cmd) {
  * Send the queued SQL to the server (flush) :
  */
 EXPORT int
-c_sy_send(CS_COMMAND *cmd) {
+c_ct_lib_send(CS_COMMAND *cmd) {
 	CS_RETCODE ret;
 
 	ret = ct_send(cmd);
@@ -488,7 +488,7 @@ c_sy_send(CS_COMMAND *cmd) {
  * Allocate a Sybase context :
  */
 EXPORT CS_CONTEXT *
-c_sy_alloc_context(void) {
+c_ct_lib_alloc_context(void) {
 	CS_CONTEXT *ctx = NULL;
 	CS_RETCODE ret;
 
@@ -513,7 +513,7 @@ errxit:		cs_ctx_drop(ctx);
  * Free a Sybase context :
  */
 EXPORT CS_CONTEXT *
-c_sy_free_context(CS_CONTEXT *ctx) {
+c_ct_lib_free_context(CS_CONTEXT *ctx) {
 	CS_RETCODE ret;
 
 	ret = ct_exit(ctx,CS_UNUSED);  /* Ignore result? */    /* DO WE NEED THIS??? *FIXME* */
@@ -528,7 +528,7 @@ c_sy_free_context(CS_CONTEXT *ctx) {
  * Free a Sybase connection :
  */
 EXPORT CS_CONNECTION *
-c_sy_free_connection(CS_CONNECTION *conn) {
+c_ct_lib_free_connection(CS_CONNECTION *conn) {
 	CS_RETCODE ret;
 
 	ret = ct_con_drop(conn);
@@ -541,7 +541,7 @@ c_sy_free_connection(CS_CONNECTION *conn) {
  * Allocate a Sybase connection :
  */
 EXPORT CS_CONNECTION *
-c_sy_alloc_connection(CS_CONTEXT *ctx,void *userdata) {
+c_ct_lib_alloc_connection(CS_CONTEXT *ctx,void *userdata) {
 	CS_CONNECTION *conn = NULL;
 	CS_RETCODE ret;
 	int sy_true = CS_TRUE;
@@ -568,7 +568,7 @@ c_sy_alloc_connection(CS_CONTEXT *ctx,void *userdata) {
 		goto xit;
 
 xit:	if ( ret != CS_SUCCEED && conn != NULL )
-		c_sy_free_connection(conn);
+		c_ct_lib_free_connection(conn);
 
 	return ret == CS_SUCCEED ? conn : NULL;	/* Success if not null */
 }
@@ -577,7 +577,7 @@ xit:	if ( ret != CS_SUCCEED && conn != NULL )
  * Set the userid for the connection :
  */
 EXPORT int
-c_sy_set_userid(CS_CONNECTION *conn,char *userid) {
+c_ct_lib_set_userid(CS_CONNECTION *conn,char *userid) {
 	CS_RETCODE ret;
 
 	ret = ct_con_props(conn,CS_SET,CS_USERNAME,userid,CS_NULLTERM,NULL);
@@ -588,7 +588,7 @@ c_sy_set_userid(CS_CONNECTION *conn,char *userid) {
  * Set the password for the connection :
  */
 EXPORT int
-c_sy_set_passwd(CS_CONNECTION *conn,char *passwd) {
+c_ct_lib_set_passwd(CS_CONNECTION *conn,char *passwd) {
 	CS_RETCODE ret;
 
 	ret = ct_con_props(conn,CS_SET,CS_PASSWORD,passwd,CS_NULLTERM,NULL);
@@ -599,7 +599,7 @@ c_sy_set_passwd(CS_CONNECTION *conn,char *passwd) {
  * Set the database name for the connection :
  */
 EXPORT int
-c_sy_set_database(CS_CONNECTION *conn,char *database) {
+c_ct_lib_set_database(CS_CONNECTION *conn,char *database) {
 	CS_RETCODE ret;
 
 	ret = ct_con_props(conn,CS_SET,CS_APPNAME,database,CS_NULLTERM,NULL);
@@ -610,7 +610,7 @@ c_sy_set_database(CS_CONNECTION *conn,char *database) {
  * Specify the host name :
  */
 EXPORT int
-c_sy_set_hostname(CS_CONNECTION *conn,char *host) {
+c_ct_lib_set_hostname(CS_CONNECTION *conn,char *host) {
 	CS_RETCODE ret;
 
 	ret = ct_con_props(conn,CS_SET,CS_HOSTNAME,host,CS_NULLTERM,NULL);
@@ -621,7 +621,7 @@ c_sy_set_hostname(CS_CONNECTION *conn,char *host) {
  * Connect to the database engine (instance) :
  */
 EXPORT int
-c_sy_connect(CS_CONNECTION *conn,char *instance) {
+c_ct_lib_connect(CS_CONNECTION *conn,char *instance) {
 	CS_RETCODE ret;
 
 	ret = ct_connect(conn,(CS_CHAR *)instance,strlen(instance));
@@ -632,7 +632,7 @@ c_sy_connect(CS_CONNECTION *conn,char *instance) {
  * Disconnect from the server :
  */
 EXPORT int
-c_sy_disconnect(CS_CONNECTION *conn) {
+c_ct_lib_disconnect(CS_CONNECTION *conn) {
 	CS_RETCODE ret;
 
 	ret = ct_close(conn,CS_UNUSED);
@@ -643,7 +643,7 @@ c_sy_disconnect(CS_CONNECTION *conn) {
  * Issue an SQL command to the server :
  */
 EXPORT CS_COMMAND *
-c_sy_exec(CS_CONNECTION *conn,char *sql) {
+c_ct_lib_exec(CS_CONNECTION *conn,char *sql) {
 	CS_COMMAND *cmd = NULL;
 	CS_RETCODE ret;
 	int rc;
@@ -657,7 +657,7 @@ c_sy_exec(CS_CONNECTION *conn,char *sql) {
 
 	ret = ct_command(cmd,CS_LANG_CMD,sql,CS_NULLTERM,CS_UNUSED);
 	if ( (rc = ISOK(ret)) != 0 )
-		rc = c_sy_send(cmd);		/* Send what we have queued */
+		rc = c_ct_lib_send(cmd);		/* Send what we have queued */
 
 	if ( !rc ) {				/* Did anything fail? */
 		if ( cmd != NULL ) {		/* Was there anything allocated? */
@@ -680,7 +680,7 @@ c_sy_exec(CS_CONNECTION *conn,char *sql) {
  *		=> returns False
  */
 EXPORT int
-c_sy_isdone(CS_COMMAND *cmd) {
+c_ct_lib_isdone(CS_COMMAND *cmd) {
 	CS_INT res = 0;
 	CS_RETCODE ret;
 
@@ -709,7 +709,7 @@ c_sy_isdone(CS_COMMAND *cmd) {
  *		=> returns False
  */
 EXPORT int
-c_sy_isend(CS_COMMAND *cmd) {
+c_ct_lib_isend(CS_COMMAND *cmd) {
 	CS_INT res = 0;
 	CS_RETCODE ret;
 
@@ -730,7 +730,7 @@ c_sy_isend(CS_COMMAND *cmd) {
  * For debugging use only :
  */
 EXPORT int
-c_sy_dbg_results(CS_COMMAND *cmd) {
+c_ct_lib_dbg_results(CS_COMMAND *cmd) {
 	CS_INT res = 0;
 	CS_RETCODE ret;
 
@@ -748,7 +748,7 @@ c_sy_dbg_results(CS_COMMAND *cmd) {
  * Just eat any pending results :
  */
 EXPORT void
-c_sy_eatresults(CS_COMMAND *cmd) {
+c_ct_lib_eatresults(CS_COMMAND *cmd) {
 	CS_INT res = 0;
 	CS_RETCODE ret;
 
@@ -760,7 +760,7 @@ c_sy_eatresults(CS_COMMAND *cmd) {
  * Open and launch an SQL cursor :
  */
 EXPORT CS_COMMAND *
-c_sy_cursor(CS_CONNECTION *conn,char *cursor_name,int namelen,char *sql,int for_update) {
+c_ct_lib_cursor(CS_CONNECTION *conn,char *cursor_name,int namelen,char *sql,int for_update) {
 	CS_COMMAND *cmd = NULL;
 	CS_RETCODE ret;
 
@@ -790,12 +790,12 @@ c_sy_cursor(CS_CONNECTION *conn,char *cursor_name,int namelen,char *sql,int for_
 	if ( ret != CS_SUCCEED )
 		goto err;
 
-	if ( !c_sy_isdone(cmd) ) {	/* Check declare cursor */
-		c_sy_eatresults(cmd);	/* Eat any other possible pending results */
+	if ( !c_ct_lib_isdone(cmd) ) {	/* Check declare cursor */
+		c_ct_lib_eatresults(cmd);	/* Eat any other possible pending results */
 		goto err;		/* Declare cursor failed */
 	}
 
-	if ( !c_sy_isdone(cmd) )	/* Check open cursor */
+	if ( !c_ct_lib_isdone(cmd) )	/* Check open cursor */
 		goto err;		/* Open cursor failed */
 
 	return cmd;			/* Success */
@@ -812,7 +812,7 @@ err:	if ( cmd != NULL )
  * Close the SQL cursor :
  */
 EXPORT int
-c_sy_close(CS_COMMAND *cmd) {
+c_ct_lib_close(CS_COMMAND *cmd) {
 	CS_RETCODE ret;
 	CS_INT res;
 
@@ -823,7 +823,7 @@ c_sy_close(CS_COMMAND *cmd) {
 	ret = ct_cursor(cmd,CS_CURSOR_CLOSE,NULL,CS_UNUSED,NULL,CS_UNUSED,CS_DEALLOC);
 	if ( ret == CS_SUCCEED ) {
 		ct_send(cmd);
-		if ( c_sy_isdone(cmd) )				/* Check the CS_CMD_DONE status */
+		if ( c_ct_lib_isdone(cmd) )				/* Check the CS_CMD_DONE status */
 			return 1;				/* Full success */
 	}
 
@@ -851,7 +851,7 @@ c_sy_close(CS_COMMAND *cmd) {
  *		of events that need to be handled.
  */
 EXPORT CS_COMMAND *
-c_sy_release(CS_COMMAND *cmd) {
+c_ct_lib_release(CS_COMMAND *cmd) {
 	CS_RETCODE ret;
 	CS_INT res;
 
@@ -884,7 +884,7 @@ c_sy_release(CS_COMMAND *cmd) {
  *		is returned via the cols parameter.
  */
 EXPORT int
-c_sy_results(CS_COMMAND *cmd,int *cols) {
+c_ct_lib_results(CS_COMMAND *cmd,int *cols) {
 	CS_RETCODE ret;
 	CS_INT res = 0;
 	CS_INT num = 0;
@@ -971,7 +971,7 @@ c_sy_results(CS_COMMAND *cmd,int *cols) {
  * Get data for the application :
  */
 EXPORT int
-c_sy_get_data(CS_COMMAND *cmd,int item,void *buffer,int buflen,int *outlen) {
+c_ct_lib_get_data(CS_COMMAND *cmd,int item,void *buffer,int buflen,int *outlen) {
 	CS_INT lcl_outlen = 0;
 	CS_RETCODE ret;
 
@@ -992,7 +992,7 @@ c_sy_get_data(CS_COMMAND *cmd,int item,void *buffer,int buflen,int *outlen) {
 }
 
 EXPORT int
-c_sy_fetch(CS_COMMAND *cmd) {
+c_ct_lib_fetch(CS_COMMAND *cmd) {
 	CS_INT rows_read;
 	CS_RETCODE ret;
 
@@ -1004,7 +1004,7 @@ c_sy_fetch(CS_COMMAND *cmd) {
 	case CS_END_DATA :
 		return SY_Fetch_End;
 	default :
-		c_sy_isdone(cmd);		/* Just eat status: we know it failed */
+		c_ct_lib_isdone(cmd);		/* Just eat status: we know it failed */
 		return SY_Fetch_Failed;
 	}
 }
@@ -1013,8 +1013,8 @@ c_sy_fetch(CS_COMMAND *cmd) {
  * Convert a data item in a result to a string :
  */
 EXPORT int
-c_sy_to_string(CS_COMMAND *cmd,int item,int src_fmt,char *dest,int *dest_len) {
-	CS_CONTEXT *ctx = c_sy_context_of(c_sy_connection_of(cmd));
+c_ct_lib_to_string(CS_COMMAND *cmd,int item,int src_fmt,char *dest,int *dest_len) {
+	CS_CONTEXT *ctx = c_ct_lib_context_of(c_ct_lib_connection_of(cmd));
 	CS_DATAFMT src_format, dst_format;
 	CS_RETCODE ret;
 	char src_buf[257];
@@ -1027,7 +1027,7 @@ c_sy_to_string(CS_COMMAND *cmd,int item,int src_fmt,char *dest,int *dest_len) {
 	/*
 	 * First get the value to convert :
 	 */
-	if ( c_sy_get_data(cmd,item,src_buf,sizeof src_buf,&src_len) != SY_GDATA_Last_Chunk )
+	if ( c_ct_lib_get_data(cmd,item,src_buf,sizeof src_buf,&src_len) != SY_GDATA_Last_Chunk )
 		return 0;		/* We failed */
 
 	if ( !src_len ) {
@@ -1110,7 +1110,7 @@ c_sy_to_string(CS_COMMAND *cmd,int item,int src_fmt,char *dest,int *dest_len) {
  * Cancel the results of the current command.
  */
 EXPORT int
-c_sy_cancel(CS_COMMAND *cmd) {
+c_ct_lib_cancel(CS_COMMAND *cmd) {
 	CS_RETCODE ret;
 	CS_INT status;
 
@@ -1130,7 +1130,7 @@ c_sy_cancel(CS_COMMAND *cmd) {
 }
 
 EXPORT int
-c_sy_bool_option(CS_CONNECTION *conn,int opt,int arg) {
+c_ct_lib_bool_option(CS_CONNECTION *conn,int opt,int arg) {
 	CS_RETCODE ret;
 	CS_INT option = opt;
 	CS_BOOL b;
@@ -1144,7 +1144,7 @@ c_sy_bool_option(CS_CONNECTION *conn,int opt,int arg) {
 }
 
 EXPORT int
-c_sy_uint_option(CS_CONNECTION *conn,int opt,unsigned arg) {
+c_ct_lib_uint_option(CS_CONNECTION *conn,int opt,unsigned arg) {
 	CS_RETCODE ret;
 	CS_INT option = opt;
 	unsigned u = arg;
@@ -1154,7 +1154,7 @@ c_sy_uint_option(CS_CONNECTION *conn,int opt,unsigned arg) {
 }
 
 EXPORT int
-c_sy_dow_option(CS_CONNECTION *conn,int opt,int arg) {
+c_ct_lib_dow_option(CS_CONNECTION *conn,int opt,int arg) {
 	CS_RETCODE ret;
 	CS_INT option = opt;
 	static CS_INT dow[] = {
@@ -1167,7 +1167,7 @@ c_sy_dow_option(CS_CONNECTION *conn,int opt,int arg) {
 }
 
 EXPORT int
-c_sy_format_option(CS_CONNECTION *conn,int opt,int arg) {
+c_ct_lib_format_option(CS_CONNECTION *conn,int opt,int arg) {
 	CS_RETCODE ret;
 	CS_INT option = opt;
 	static CS_INT fmt[] = {
@@ -1179,7 +1179,7 @@ c_sy_format_option(CS_CONNECTION *conn,int opt,int arg) {
 }
 
 EXPORT int
-c_sy_string_option(CS_CONNECTION *conn,int opt,char * arg) {
+c_ct_lib_string_option(CS_CONNECTION *conn,int opt,char * arg) {
 	CS_RETCODE ret;
 	CS_INT option = opt;
 	
@@ -1187,4 +1187,4 @@ c_sy_string_option(CS_CONNECTION *conn,int opt,char * arg) {
 	return ret == CS_SUCCEED ? 1 : 0;
 }
 
-/* End $Source: /cvsroot/apq/apq/c_sybase.c,v $ */
+/* End $Source: /cvsroot/apq/apq/c_ct_libbase.c,v $ */
