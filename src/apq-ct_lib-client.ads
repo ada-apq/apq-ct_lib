@@ -176,7 +176,7 @@ private
 			OS_Message :		Interfaces.C.strings.chars_ptr;
 			OS_Message_Length :	APQ.CT_Lib.Int_Type
 	  );
-	pragma Export(C, Client_Msg_CB, "client_msg_cb");
+	pragma Export(C, Client_Msg_CB, "ct_lib_client_msg_cb");
 
 	type Server_Msg_CB is access
 		procedure(
@@ -191,7 +191,7 @@ private
 			Proc_Name_Length :	APQ.CT_Lib.Int_Type;
 			Message :		Interfaces.C.Strings.chars_ptr
 		);
-	pragma Export(C, Server_Msg_CB, "server_msg_cb");
+	pragma Export(C, Server_Msg_CB, "ct_lib_server_msg_cb");
 
 	procedure Set_Client_CB(Proc : Client_Msg_CB);
 	procedure Set_Server_CB(Proc : Server_Msg_CB);
@@ -207,7 +207,7 @@ private
 		OS_Message :		Interfaces.C.Strings.chars_ptr;
 		OS_Message_Length :	APQ.CT_Lib.Int_Type
 	);
-	pragma Export(C,CT_Lib_Client_CB,"CT_Lib_client_cb");
+	pragma Export(C,CT_Lib_Client_CB,"ct_lib_client_cb");
 
 	procedure CT_Lib_Server_CB(
 		Connection :		System.Address;
@@ -221,7 +221,7 @@ private
 		Proc_Name_Length :	APQ.CT_Lib.Int_Type;
 		Message :		Interfaces.C.Strings.chars_ptr
 	);
-	pragma Export(C,CT_Lib_Server_CB,"CT_Lib_server_cb");
+	pragma Export(C,CT_Lib_Server_CB,"ct_lib_server_cb");
 
 
 end APQ.CT_Lib.Client;
