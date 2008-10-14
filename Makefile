@@ -28,7 +28,7 @@ apq-ct_lib.ads-clean:
 
 
 c_libs: apq-ct_lib.ads c_objs
-	cd lib && gcc -shared ../obj-c/c_ct_lib.o -o libapq-ct_libhelp.so
+	cd lib && gcc -shared  ../obj-c/c_ct_lib.o -o libapq-ct_libhelp.so  -lct
 
 #c_objs:
 #	cd obj-c && gcc -I../src-c ../src-c/numeric.c -c -o numeric.o && gcc -I../src-c ../src-c/notices.c -c -o notices.o

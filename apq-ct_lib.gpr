@@ -9,6 +9,7 @@
 
 
 with "apq.gpr";
+with "apq-ct_lib_c.gpr";
 
 project APQ.ct_lib is
 
@@ -40,16 +41,20 @@ project APQ.ct_lib is
 
 
 	package Linker is
-		for Default_Switches ("Ada") use
-			APQ.Linker'Default_Switches("Ada") &
-			"-lapq-ct_libhelp" &
-			"-lct";
---			"-lpq" &
---			"-lsybdb" & 
---			"-ltds" & 
---			"-ltdsodbc" &
---			"-ltdssrv";
---			"-lapq-ct_libhelp";
+		case target is
+			when "WIN32" =>
+				for Default_Switches ("Ada") use
+					APQ.Linker'Default_Switches("Ada") &
+					"-lapq-ct_libhelp" &
+					"-Lc:/MinGW/lib" &
+					"-lct";
+
+			when others =>	
+				for Default_Switches ("Ada") use
+					APQ.Linker'Default_Switches("Ada") &
+					"-lapq-ct_libhelp" &
+					"-lct";
+		end case;
 	end Linker;
 
 end APQ.ct_lib;
