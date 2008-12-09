@@ -319,6 +319,7 @@ c_ct_lib_describe(
 	assert(cmd != NULL);
 	assert(itemx > 0);
 
+	// TODO: use ct_bind for retrieving raw data types such as datetime
 	ret = ct_describe(cmd,itemx,&fmt);
 	if ( ret != CS_SUCCEED )
 		return 0;		/* Call failed */
