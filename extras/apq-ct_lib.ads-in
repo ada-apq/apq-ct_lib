@@ -237,6 +237,7 @@ private
 	function CT_Lib_Set_Passwd(Conn : CT_Lib_Conn_Type; Passwd : String_Ptr) return Boolean;
 	function CT_Lib_Set_Database(Conn : CT_Lib_Conn_Type; Database : String_Ptr) return Boolean;
 	function CT_Lib_Connect(Conn : CT_Lib_Conn_Type; Instance : String) return Boolean;
+	function CT_Lib_Is_Connected(Conn : CT_Lib_Conn_Type) return Integer;
 	function CT_Lib_Disconnect(Conn : CT_Lib_Conn_Type) return Boolean;
 
 	function CT_Lib_Exec(Conn : CT_Lib_Conn_Type; SQL : String) return CT_Lib_Cmd_Type;
@@ -277,6 +278,7 @@ private
 	pragma import(C,CT_Lib_Connection_Of,"c_ct_lib_connection_of");
 	pragma import(C,CT_Lib_Alloc_Context,"c_ct_lib_alloc_context");
 	pragma import(C,CT_Lib_Alloc_Connection,"c_ct_lib_alloc_connection");
+	pragma import(C,CT_Lib_Is_Connected, "c_ct_lib_is_connected");
 	pragma import(C,CT_Lib_Release,"c_ct_lib_release");
 	pragma import(C,CT_Lib_Fetch,"c_ct_lib_fetch");
 

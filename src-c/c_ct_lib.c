@@ -39,6 +39,7 @@
 #include <assert.h>
 
 #include <ctpublic.h>
+#include <cstypes.h>
 //#include <sqlca.h>
 
 
@@ -628,6 +629,37 @@ c_ct_lib_connect(CS_CONNECTION *conn,char *instance) {
 	ret = ct_connect(conn,(CS_CHAR *)instance,strlen(instance));
 	return ISOK(ret);
 }
+
+
+/*
+ * Check if the database connection is still alive
+ * Return 1 if it's alive and 0 if it's not connected
+ */
+EXPORT int
+c_ct_lib_is_connected(CS_CONNECTION *conn) {
+
+
+	CS_INT outlen;
+	char tmphostname[100];
+	CS_RETCODE code;
+
+
+	if(!conn)
+		return 0;
+	
+	// if the connection exists...
+	
+	// I'm not sure, but I'm assuming it connects to the server to check the hostname. :D
+	// TODO: check if the ct_lib client ask the server for it's host name or if it uses the configuration
+	code = ct_con_props (conn, (long)CS_GET, (long)CS_HOSTNAME, tmphostname, 100, &outlen);
+
+	if(code != CS_SUCCEED)
+		return 0;
+	
+	// if got here, it was succeeded and the connection is alive.
+	return 1;
+}
+
 
 /*
  * Disconnect from the server :

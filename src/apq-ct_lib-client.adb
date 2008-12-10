@@ -568,9 +568,11 @@ package body APQ.CT_Lib.Client is
 
 
 	function Is_Connected(C : Connection_Type) return Boolean is
+
+
 	begin
-		if C.Connection /= Null_Connection then
-			return C.Connected;
+		if C.Connection /= Null_Connection and then C.Connected then
+			return Ct_Lib_Is_Connected( C.Connection ) = 1;
 		else
 			return False;
 		end if;
