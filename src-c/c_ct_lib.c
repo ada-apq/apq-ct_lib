@@ -634,6 +634,8 @@ c_ct_lib_connect(CS_CONNECTION *conn,char *instance) {
 /*
  * Check if the database connection is still alive
  * Return 1 if it's alive and 0 if it's not connected
+ * TODO: make this function really work.
+ * TODO: see if there is ANY mysql_ping equivalent in ct_lib
  */
 EXPORT int
 c_ct_lib_is_connected(CS_CONNECTION *conn) {
