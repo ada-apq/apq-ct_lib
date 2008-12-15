@@ -447,14 +447,14 @@ package body APQ.CT_Lib.Client is
 
 
 
-	procedure Connect(C : in out Connection_Type) is
+	procedure Connect(C : in out Connection_Type; Check_Connection : Boolean := True) is
 		use Interfaces.C.Strings;
 		A_Unix :	System.Address := System.Null_Address;
 	begin
 
 		Clear_Error(C);
 
-		if Is_Connected(C) then
+		if Check_Connection and then Is_Connected(C) then
 			Raise_Exception(Already_Connected'Identity,
 				"SY06: Already connected (Connect).");
 		end if;
