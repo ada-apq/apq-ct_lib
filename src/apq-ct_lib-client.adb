@@ -120,10 +120,19 @@ package body APQ.CT_Lib.Client is
 	--
 	procedure Use_Database(C : in out Connection_Type; DB_Name : String) is
 		Q : Query_Type;
+		USE_SQL : String := "USE " & To_Case(DB_Name,C.SQL_Case);
+		Date_Format_SQL : String := "set DATEFORMAT ymd";
 	begin
 		begin
-			Prepare(Q,"USE " & To_Case(DB_Name,C.SQL_Case));
-			Execute(Q,C);
+
+			-- USE --
+			Prepare( Q, Use_SQL );
+			Execute( Q, C );
+
+			-- set DATEFORMAT
+			Prepare( Q, Date_Format_SQL );
+			Execute( Q, C );
+
 		exception
 			when SQL_Error =>
 				Raise_Exception(APQ.Use_Error'Identity,
@@ -904,6 +913,7 @@ package body APQ.CT_Lib.Client is
 		-- Cheats that are needed at the moment :
 		Query.SQLCA := Connection_Type(Connection).SQLCA;		-- Share same SQLCA
 		Clear_SQLCA(Query.SQLCA.all);
+
 
 		declare
 			use Interfaces.C;
