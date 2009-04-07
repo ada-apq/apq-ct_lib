@@ -5,6 +5,14 @@
 
 projectFile="apq-ct_lib.gpr"
 
+#OUTPUT_NAME is the name of the compiled library.
+ifeq ($(OS), Windows_NT)
+	OUTPUT_NAME=apq-ct_libhelp.dll
+else
+	OUTPUT_NAME=libapq-ct_libhelp.so
+endif
+
+
 
 libs: c_libs
 	gnatmake -P ${projectFile}
@@ -28,7 +36,7 @@ apq-ct_lib.ads-clean:
 
 
 c_libs: apq-ct_lib.ads c_objs
-	cd lib && gcc -shared  ../obj-c/c_ct_lib.o -o libapq-ct_libhelp.dll  -lct
+	cd lib && gcc -shared  ../obj-c/c_ct_lib.o -o $(OUTPUT_NAME)  -lct
 
 #c_objs:
 #	cd obj-c && gcc -I../src-c ../src-c/numeric.c -c -o numeric.o && gcc -I../src-c ../src-c/notices.c -c -o notices.o
