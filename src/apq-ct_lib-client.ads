@@ -88,7 +88,6 @@ package APQ.CT_Lib.Client is
 	------------------------------
 
 	procedure Clear(Q : in out Query_Type);
-	procedure Append(Q : in out Query_Type; V : APQ_Boolean; After : String := "");
 	procedure Append_Quoted(Q : in out Query_Type; Connection : Root_Connection_Type'Class; SQL : String; After : String := "");
 	procedure Set_Fetch_Mode(Q : in out Query_Type; Mode : Fetch_Mode_Type);
 

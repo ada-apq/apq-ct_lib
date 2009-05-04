@@ -842,17 +842,6 @@ package body APQ.CT_Lib.Client is
 
 
 
-	procedure Append(Q : in out Query_Type; V : APQ_Boolean; After : String := "") is
-	begin
-		if V = True then
-			Append(Q,"1",After);
-		else
-			Append(Q,"0",After);
-		end if;
-	end Append;
-
-
-
 	procedure Append_Quoted(Q : in out Query_Type; Connection : Root_Connection_Type'Class; SQL : String; After : String := "") is
 
 		function Quote_String(S : String; Quote_Character : Character) return String is
