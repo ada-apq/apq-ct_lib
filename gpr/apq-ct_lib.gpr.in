@@ -1,0 +1,58 @@
+-- Build file for APQ.ct_lib.
+--
+-- author Marcelo Coraça de Freitas <marcelo.batera@gmail.com> 
+--
+-- Repository information:
+-- $Date: 2008-02-25 19:47:48 -0300 (Seg, 25 Fev 2008) $
+-- $Revision: 234 $
+-- $Author: ogro $
+
+
+with "apq.gpr";
+with "apq-ct_lib_c.gpr";
+
+project APQ.ct_lib is
+
+	version	:= APQ.Version;
+	target	:= APQ.Supported_OS := APQ.Target;
+	prefix	:= $prefix;
+	
+
+	for Languages use ( "Ada", "C" );
+	for Source_Dirs use ( prefix & "/include/ct_lib" );
+	
+	-- LIBRARY
+	for Library_Dir use prefix & "/lib";
+	for Library_Name use "apq-ct_lib";
+	for Library_Kind use APQ'Library_Kind;
+
+	for Library_Version use "libapq-ct_lib.so." & Version;
+	
+	
+	package Compiler is
+		for Default_Switches ("ada") use ("-O2", "-gnat05");
+	end Compiler;
+
+
+
+	package Linker is
+		case target is
+			when "Windows_NT" =>
+				for Default_Switches ("Ada") use (
+					"-lapq-ct_libhelp",
+					"-Lc:/MinGW/lib",
+					"-lct"
+				);
+
+			when others =>	
+				for Default_Switches ("Ada") use (
+					"-lapq-ct_libhelp",
+					"-lct"
+				);
+		end case;
+	end Linker;
+	
+	for Externally_Built use "true";
+
+end APQ.ct_lib;
+
