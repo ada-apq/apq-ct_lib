@@ -51,10 +51,10 @@ c_libs: apq-ct_lib.ads c_objs
 #c_objs:
 #	cd obj-c && gcc -I../src-c ../src-c/numeric.c -c -o numeric.o && gcc -I../src-c ../src-c/notices.c -c -o notices.o
 
-all: libs gprfiles
+all: libs 
 
 
-clean: apq-ct_lib.ads-clean c_objs-clean gprclean
+clean: apq-ct_lib.ads-clean c_objs-clean 
 	@rm -f obj-c/* lib/*
 	gnatclean -P ${projectFile}
 	@echo "All clean"
@@ -76,7 +76,7 @@ gprclean:
 	@rm -f gpr/*.def
 
 
-install:
+install: gprfile
 	@echo "Installing files"
 	install -d $(INCLUDE_PREFIX)
 	install -d $(LIB_PREFIX)
@@ -84,3 +84,4 @@ install:
 	install src*/*.* -t $(INCLUDE_PREFIX)
 	install lib/* -t $(LIB_PREFIX)
 	install gpr/*.gpr -t $(GPR_PREFIX)
+	make gprclean
