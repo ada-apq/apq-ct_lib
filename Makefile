@@ -7,9 +7,16 @@ VERSION=3.0
 ifndef ($(PREFIX))
 	PREFIX=/usr/local
 endif
-INCLUDE_PREFIX=$(PREFIX)/include/ct_lib
-LIB_PREFIX=$(PREFIX)/lib
-GPR_PREFIX=$(LIB_PREFIX)/gnat
+ifndef ($(INCLUDE_PREFIX))
+	INCLUDE_PREFIX=$(PREFIX)/include/apq
+endif
+
+ifndef ($(LIB_PREFIX))
+	LIB_PREFIX=$(PREFIX)/lib
+endif
+ifndef ($(GPR_PREFIX)) 
+	GPR_PREFIX=$(LIB_PREFIX)/gnat 
+endif
 
 
 projectFile="apq-ct_lib.gpr"
@@ -68,6 +75,8 @@ gprfile:
 	@echo "Preparing GPR file.."
 	@echo version:=\"$(VERSION)\" > gpr/apq.def
 	@echo prefix:=\"$(PREFIX)\" >> gpr/apq.def
+	@echo lib_prefix:=\"$(LIB_PREFIX)\" >> gpr/apq.def
+	@echo include_prefix:=\"$(INCLUDE_PREFIX)\" >> gpr/apq.def
 	@gnatprep gpr/apq-ct_lib.gpr.in gpr/apq-ct_lib.gpr gpr/apq.def
 	@gnatprep gpr/apq-ct_lib_c.gpr.in gpr/apq-ct_lib_c.gpr gpr/apq.def
 

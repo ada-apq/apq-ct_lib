@@ -6,12 +6,12 @@ with "apq.gpr";
 project APQ.ct_lib_c is
 
 	Version	:= APQ.Version;
-	prefix	:= $prefix;
+	
 	for Languages use ("C");
 
-	for Source_Dirs use ( prefix & "/include/ct_lib" );
+	for Source_Dirs use ( $include_prefix );
 
-	for Library_Dir use prefix & "/lib";
+	for Library_Dir use $lib_prefix;
 
 	for Library_Name use "apq-ct_libhelp";
 	for Library_Kind use APQ'Library_Kind;
