@@ -3,7 +3,7 @@
 # @author Marcelo Coraça de Freitas <marcelo.batera@gmail.com> 
 
 PROJECT_FILES=apq-ct_lib_c.gpr apq-ct_lib.gpr
-GPR_FILES=apq-ct_lib.gpr apq-ct_lib_c.gpr
+GPR_FILES=apq-ct_lib_c.gpr apq-ct_lib.gpr
 
 
 INCLUDE_FILES=src*/*
