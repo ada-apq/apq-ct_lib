@@ -5,6 +5,9 @@
 PROJECT_FILES=apq-ct_lib_c.gpr apq-ct_lib.gpr
 GPR_FILES=apq-ct_lib.gpr apq-ct_lib_c.gpr
 
+
+INCLUDE_FILES=src*/*
+
 #OUTPUT_NAME is the name of the compiled library.
 ifeq ($(OS), Windows_NT)
 	OUTPUT_NAME=apq-ct_libhelp.dll
