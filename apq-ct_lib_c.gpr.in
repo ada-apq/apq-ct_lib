@@ -5,7 +5,7 @@ with "apq.gpr";
 
 project APQ.ct_lib_c is
 
-	Version := APQ.Version;
+	Version := $version;
 	for Languages use ("C");
 
 	for Source_Dirs use ("src-c");

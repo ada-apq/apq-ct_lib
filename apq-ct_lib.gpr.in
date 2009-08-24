@@ -13,7 +13,7 @@ with "apq-ct_lib_c.gpr";
 
 project APQ.ct_lib is
 
-	version := APQ.Version;
+	version := $version;
 	target: APQ.Supported_OS := APQ.Target;
 	
 

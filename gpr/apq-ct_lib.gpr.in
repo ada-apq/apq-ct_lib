@@ -13,16 +13,16 @@ with "apq-ct_lib_c.gpr";
 
 project APQ.ct_lib is
 
-	version	:= APQ.Version;
+	version	:= $version;
 	target	: APQ.Supported_OS := APQ.Target;
 	
 	
 
 	for Languages use ( "Ada", "C" );
-	for Source_Dirs use ( $include_prefix );
+	for Source_Dirs use ( $include_path );
 	
 	-- LIBRARY
-	for Library_Dir use $lib_prefix;
+	for Library_Dir use $lib_path;
 	for Library_Name use "apq-ct_lib";
 	for Library_Kind use APQ'Library_Kind;
 
