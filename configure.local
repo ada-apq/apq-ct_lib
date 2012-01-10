@@ -49,9 +49,9 @@ fi
 
 if [[ "${CT_LIB_PATH}" != "" ]]
 then
-	CT_LIB_CFLAGS="-I${CT_LIB_PATH}\include" 
-	CT_LIB_LIBS="-L${CT_LIB_PATH}\lib -lct"
-	CT_LIB_INCLUDE_PATH="${CT_LIB_PATH}\include"
+	CT_LIB_CFLAGS="-I${CT_LIB_PATH}/include" 
+	CT_LIB_LIBS="-L${CT_LIB_PATH}/lib -lct"
+	CT_LIB_INCLUDE_PATH="${CT_LIB_PATH}/include"
 else
 	CT_LIB_LIBS="-lct"
 fi

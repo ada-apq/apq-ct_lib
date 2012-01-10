@@ -38,7 +38,9 @@ test_is_set(){
 # Print into the standart output the list of ct_lib codes for data types
 get_field_type_codes(){
 	cp src-in/ct_lib_gentyp.c "$TMP_PATH/"
-	$CC "${TMP_PATH}/ct_lib_gentyp.c" -o "${TMP_PATH}/ct_lib_gentyp" $CT_LIB_CFLAGS $CT_LIB_LIBS -I"${TMP_PATH}" && ./"$TMP_PATH/ct_lib_gentyp" |  sort -k1,1n
+	echo $CC "${TMP_PATH}/ct_lib_gentyp.c" -o "${TMP_PATH}/ct_lib_gentyp" $CT_LIB_CFLAGS -I"${TMP_PATH}" > lol
+	
+	$CC "${TMP_PATH}/ct_lib_gentyp.c" -o "${TMP_PATH}/ct_lib_gentyp" $CT_LIB_CFLAGS -I"${TMP_PATH}" && ./"$TMP_PATH/ct_lib_gentyp" |  sort -k1,1n
 }
 
 
@@ -49,7 +51,7 @@ get_field_type_codes(){
 
 get_connection_options(){
 	cp src-in/ct_lib_opts.c "$TMP_PATH/"
-	$CC "${TMP_PATH}/ct_lib_opts.c" -o "${TMP_PATH}/ct_lib_opts" $CT_LIB_CFLAGS $CT_LIB_LIBS -I"${TMP_PATH}" && ./"$TMP_PATH/ct_lib_opts" 
+	$CC "${TMP_PATH}/ct_lib_opts.c" -o "${TMP_PATH}/ct_lib_opts" $CT_LIB_CFLAGS -I"${TMP_PATH}" && ./"$TMP_PATH/ct_lib_opts" 
 }
 
 
