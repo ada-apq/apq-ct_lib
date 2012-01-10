@@ -1,0 +1,125 @@
+#!/usr/bin/env bash
+# 
+# Local configuration file for APQ.ct_lib
+
+################
+# Project Name #
+################
+
+project="apq-ct_lib"
+
+
+
+
+if [[ "$CC" = "" ]]
+then
+	CC=gcc;
+fi
+
+###################
+# Standard Checks #
+###################
+check_project apq
+
+
+check_in_path sed
+check_in_path grep
+
+
+
+######################################
+# Used to query ct_lib variable codes #
+######################################
+echo "The next check use the environment variable CC (default set to gcc). Change it to you C compiler."
+check_in_path $CC;
+
+
+
+###################################
+# ct_lib Compiler and Linker Flags #
+###################################
+
+
+if [[ "$OS" = "Windows_NT" && "${CT_LIB_PATH}" = "" ]]
+then
+	echo "Please set the CT_LIB_PATH environment variable pointing to your ct_lib installment";
+	exit -1;
+fi
+
+
+if [[ "${CT_LIB_PATH}" != "" ]]
+then
+	CT_LIB_CFLAGS="-I${CT_LIB_PATH}\include" 
+	CT_LIB_LIBS="-L${CT_LIB_PATH}\lib -lct"
+	CT_LIB_INCLUDE_PATH="${CT_LIB_PATH}\include"
+else
+	CT_LIB_LIBS="-lct"
+fi
+
+
+
+
+#############################
+# apq-ct_lib.ads Generation #
+#############################
+
+if [[ "$TMP_PATH" = "" ]]
+then
+	TMP_PATH=removemeplease
+fi
+
+if [[ -f src/apq-ct_lib.ads ]]
+then
+	echo "apq-ct_lib.ads exists";
+else
+	
+	TMP_ADS="$TMP_PATH/apq-ct_lib.ads"
+	mkdir -p "$TMP_PATH";
+	cp "src-in/apq-ct_lib.ads.in" "$TMP_ADS"
+
+
+	echo "Generating src/apq-ct_lib.ads";
+	source configure-ct_lib.sh;
+
+
+	# Field Types
+
+	echo -n "    * Getting type codes                    ... ";
+	field_types=`get_field_type_codes`;
+	test_is_set "${field_types}"
+
+	echo -n "    * Setting type codes                    ... ";
+	set_enum_values "$TMP_ADS" "$field_types" "FIELD_TYPE"
+
+
+	# Error/Return codes
+
+
+	# Connection options codes
+
+	echo -n "    * Getting ct_lib connection options ... ";
+	connection_options=`get_connection_options`
+	test_is_set "${connection_options}"
+	replace_in_file "$TMP_ADS" "%CT_LIB_CONNECTION_OPTIONS%" "$connection_options"
+
+
+	linker_options=`get_linker_options`
+	echo "$linker_options"
+	replace_in_file "$TMP_ADS" "%CT_LIB_LIBS%" "$linker_options"
+
+
+
+	mv "$TMP_ADS" src/ && echo "    => APQ.ct_lib specification file seems to be ready now..." 
+fi
+
+
+mkdir -p gnat
+GPR="gnat/apq-ct_lib.gpr.in";
+cp "src-in/apq-ct_lib.gpr.in" $GPR
+
+list=`sedfy_gpr_list "$CT_LIB_CFLAGS"` 
+replace_in_file "$GPR" "%CT_LIB_CFLAGS%" "$list"
+
+
+
+set_configuration APQCTLIB_EXTERNALLY_BUILT "false"
