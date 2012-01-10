@@ -40,7 +40,7 @@ with Interfaces.C;
 package APQ.CT_Lib is
 
 	-- CT_LIB Linker Options
-
+%CT_LIB_LIBS%
 	--
 	-- Results from a query execution :
 	--
@@ -67,10 +67,10 @@ package APQ.CT_Lib is
 	for Result_Type'Size use 32;           -- Must be integer sized (see c_ct_lib.c)
 
 	type Field_Type is (
- 		%type:Field_Type%
+%FIELD_TYPE_DECLARATION%
 	);
 	for Field_Type use (
- 		%for:Field_Type%
+%FIELD_TYPE_FOR%
 	);
 	for Field_Type'Size use 32;
 

@@ -100,7 +100,7 @@ else
 	echo -n "    * Getting ct_lib connection options ... ";
 	connection_options=`get_connection_options`
 	test_is_set "${connection_options}"
-	replace_in_file "$TMP_ADS" "%CT_LIB_CONNECTION_OPTIONS%" "$connection_options"
+	replace_in_file "$TMP_ADS" "%CT_LIB_OPTIONS%" "$connection_options"
 
 
 	linker_options=`get_linker_options`

@@ -44,7 +44,10 @@
 //#include <sqlca.h>
 
 
-#define CS_VERSION_125          (CS_INT)12501
+#ifndef CS_VERSION_125
+	#define CS_VERSION_125          (CS_INT)12501
+#endif
+
 #define SY_VERSION CS_VERSION_125	/* Sybase 12.5.x */
 
 /*

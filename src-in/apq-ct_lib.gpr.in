@@ -64,7 +64,7 @@ project APQ.ct_lib is
 	----------------------
 	package Compiler is
 		for Default_Switches ( "Ada" ) use ( "-O2", "-gnat05", "-fPIC" ); 
-		for Default_Switches ( "C" ) use ( %CT_LIB_CFLAGS% )
+		for Default_Switches ( "C" ) use ( %CT_LIB_CFLAGS% );
 		case Debug is
 			when "true" =>
 				for Default_Switches ("ada") use Compiler'Default_Switches("Ada") & ( "-g" );
@@ -74,5 +74,5 @@ project APQ.ct_lib is
 
 
 
-end APQ.MySQL;
+end APQ.ct_lib;
 
