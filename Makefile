@@ -16,7 +16,6 @@ uninstall:
 	./scripts/uninstall.sh
 clean:
 	./scripts/clean.sh
-	@rm -f src/apq-ct_lib.ads
 
 distclean: 
 	@-${MAKE} clean
