@@ -2,6 +2,8 @@
 
 This is the ct\_lib impementation for the APQ database bindings.
 
+This implementation support both **Sybase** and **Ms SQL Server**.
+
 The [main APQ](https://github.com/ada-apq/apq) repository
 contains more useful documentation, but as a simple example:
 
